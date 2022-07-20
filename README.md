@@ -32,7 +32,7 @@ From clean reads to genome with annotations
     a）antiSMASH：次级代谢基因簇（BGC）注释
     b）gutSMASH：肠道菌初级代谢基因簇（MGC）注释
     c）抗性基因的基因簇预测ARTS 【这个先不加】
-
+14）单基因组可视化：CGView （比较简单的命令行，参考：https://github.com/paulstothard/cgview）
 
 （流程按主要步骤的顺序，细节参考WGS-Pipeline.py文件里，以及SOP里的相关部分）
 【每个子项，参考dbCAN2和VFDB的子文件进行创建和补充】
