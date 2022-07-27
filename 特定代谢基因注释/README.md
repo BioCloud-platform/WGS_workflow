@@ -4,26 +4,26 @@
 ## 主要分类及对应的数据库路径：
 原核生物的KEGG: /home/chenjunyu/databases/kegg/prokaryotes_filter <br>
 BileAcide: <br>
-    a) bai基因簇、BSH、7aHSDH、7bHSDH : /home/licun/Data/Blastp_0829/ZCH/zch_three_strain/bile_acid <br>
-    b) 5AR、5BR、3bHSDH、3aHSDH : /home/licun/Data/Blastp_0829/WGS_LDlab/WGS3.0/muban_seq/BileAcid <br>
-    后面可以考虑把两者融合，并把路径更新到公共数据库里面<br>
-
+      a) bai基因簇、BSH、7aHSDH、7bHSDH : /home/licun/Data/Blastp_0829/ZCH/zch_three_strain/bile_acid <br>
+      b) 5AR、5BR、3bHSDH、3aHSDH : /home/licun/Data/Blastp_0829/WGS_LDlab/WGS3.0/muban_seq/BileAcid <br>
+      后面可以考虑把两者融合，并把路径更新到公共数据库里面<br>
+<br>
 SCFA: /data/Xianjinyuan/LD_lab/databases/SCFA，分为acetate_protein、butyrate_protein、propionate_protein 三个子库<br>
     scfa kegg genes.xlsx 是我们内部整理的gene list ； http://fungene.cme.msu.edu/scfa/browse.jsp 是刘红宾提供的源数据库网址 <br>
-
+<br>
 特定代谢酶: 肠道菌：酪氨酸脱羧酶TyrDC，Futc岩藻糖转移酶；植物菌：8-羟基喹啉代谢酶；IAA代谢基因簇<br>
-    a)8-羟基喹啉代谢酶   /home/nihaoran/blastp/8_hydroxy/8_hydroxy<br>
-    b)喹啉2-氧化酶 /home/nihaoran/blastp/quinoline/uniprot_quinoline+2_oxidoreductase<br>
-    c)喹啉4-氧化基因簇   /home/nihaoran/blastp/quinaldine_4_oxidase/quinaldine_4_oxidase<br>
-    d)IAA代谢基因簇    /home/nihaoran/blastp/lac_gut/iac<br>
-    e)α-1,2-岩藻糖转移酶    /home/nihaoran/blastp/HMO/FUTC<br>
-    f)酪氨酸脱羧酶  /home/nihaoran/blastp/L_Dopa_MBGC<br>
-
+      a)8-羟基喹啉代谢酶   /home/nihaoran/blastp/8_hydroxy/8_hydroxy<br>
+      b)喹啉2-氧化酶 /home/nihaoran/blastp/quinoline/uniprot_quinoline+2_oxidoreductase<br>
+      c)喹啉4-氧化基因簇   /home/nihaoran/blastp/quinaldine_4_oxidase/quinaldine_4_oxidase<br>
+      d)IAA代谢基因簇    /home/nihaoran/blastp/lac_gut/iac<br>
+      e)α-1,2-岩藻糖转移酶    /home/nihaoran/blastp/HMO/FUTC<br>
+      f)酪氨酸脱羧酶  /home/nihaoran/blastp/L_Dopa_MBGC<br>
+<br>
 噬菌体裂解酶：收集了信息，但是还没整理<br>
-
+<br>
 其他功能有待补充 <br>
 可参考FunGene：http://fungene.cme.msu.edu/index.spr;jsessionid=E5A3AC6093A533638C9B89D0B7347F6E.10.0.0.29<br>
-
+<br>
 
 ## 解读PPT
 特定代谢基因注释.pptx
