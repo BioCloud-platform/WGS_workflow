@@ -14,14 +14,14 @@ WGS_SOP_2022.06.30.docx，但是里面不少步骤没有整合，还需要另外
 7）基因通路注释：kofamscan 【这个先不加也行】<br>
 8）代谢基因注释<br>
     a) CAZy注释：dbCAN2 【见CAZy_dbCAN2子文件夹，里面的python不是针对snakemake的，整合到snakemake时需要进行修改另外保存在scripts文件夹里，这个原始版本不要改】<br>
-    b) 特定代谢基因注释【这个先不加】<br>
+    b) 特定代谢基因注释<br>
 9）毒力基因：VFDB 【见blastp_func_anno-VFDB子文件夹】<br>
 10）抗性基因：<br>
     a）抗生素抗性：RGI<br>
-    b）抗噬菌体抗性：PADLOC【见PADLOC子文件夹】<br>
+    b）抗噬菌体抗性：PADLOC<br>
     c) CRISPR：CRSPRDetect【这个先不加】<br>
 11) 水平转移:<br>
-    a) digIS转座酶(insertion sequence elements)注释：<br>
+    a) digIS转座酶(insertion sequence elements)注释 【待玉灿补充】：<br>
     b) mgefinder【这个先不加】<br>
     c) https://pypi.org/project/MobileElementFinder/ 【这个先不加】<br>
 12) 其他特性预测<br>

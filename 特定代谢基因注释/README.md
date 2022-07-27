@@ -7,11 +7,23 @@ BileAcide: <br>
     a) bai基因簇、BSH、7aHSDH、7bHSDH : /home/licun/Data/Blastp_0829/ZCH/zch_three_strain/bile_acid <br>
     b) 5AR、5BR、3bHSDH、3aHSDH : /home/licun/Data/Blastp_0829/WGS_LDlab/WGS3.0/muban_seq/BileAcid <br>
     后面可以考虑把两者融合，并把路径更新到公共数据库里面<br>
-肠道菌：酪氨酸脱羧酶TyrDC，Futc岩藻糖转移酶；<br>
-植物菌：8-羟基喹啉代谢酶；IAA代谢基因簇<br>
-SCFA: scfa kegg genes.xlsx 是我们内部整理的gene list ； http://193.175.244.101/Butyrate/ 有序列（匹配https://journals.asm.org/doi/10.1128/msystems.00130-17?permanently=true 的文章   ） <br>
+
+SCFA: /data/Xianjinyuan/LD_lab/databases/SCFA，分为acetate_protein、butyrate_protein、propionate_protein 三个子库<br>
+    scfa kegg genes.xlsx 是我们内部整理的gene list ； http://fungene.cme.msu.edu/scfa/browse.jsp 是刘红宾提供的源数据库网址 <br>
+
+特定代谢酶: 肠道菌：酪氨酸脱羧酶TyrDC，Futc岩藻糖转移酶；植物菌：8-羟基喹啉代谢酶；IAA代谢基因簇<br>
+    a)8-羟基喹啉代谢酶   /home/nihaoran/blastp/8_hydroxy/8_hydroxy<br>
+    b)喹啉2-氧化酶 /home/nihaoran/blastp/quinoline/uniprot_quinoline+2_oxidoreductase<br>
+    c)喹啉4-氧化基因簇   /home/nihaoran/blastp/quinaldine_4_oxidase/quinaldine_4_oxidase<br>
+    d)IAA代谢基因簇    /home/nihaoran/blastp/lac_gut/iac<br>
+    e)α-1,2-岩藻糖转移酶    /home/nihaoran/blastp/HMO/FUTC<br>
+    f)酪氨酸脱羧酶  /home/nihaoran/blastp/L_Dopa_MBGC<br>
+
+噬菌体裂解酶：收集了信息，但是还没整理<br>
+
 其他功能有待补充 <br>
-可参考FunGene：http://fungene.cme.msu.edu/index.spr;jsessionid=E5A3AC6093A533638C9B89D0B7347F6E.10.0.0.29
+可参考FunGene：http://fungene.cme.msu.edu/index.spr;jsessionid=E5A3AC6093A533638C9B89D0B7347F6E.10.0.0.29<br>
+
 
 ## 解读PPT
 特定代谢基因注释.pptx
@@ -31,6 +43,7 @@ SCFA: scfa kegg genes.xlsx 是我们内部整理的gene list ； http://193.175.
 The ENV should have the required python libraries in the python script and the seqkit
 
 ```
+conda activate /home/chenjunyu/miniconda3/envs/anno/
 python /data/Xianjinyuan/tanyuxiang/YT_scripts/blastp_func_anno.py -i . -o 输出目录 -db 数据库路径 -pi 50 -cov 50 -p faa
 ```
 
@@ -57,8 +70,19 @@ conda install -c bioconda seqkit
 ```
 diamond makedb --in seq.faa --db database_name
 ```
-seq.faa是要提前准备好的数据格式
+seq.faa是要提前准备好的数据格式:faa 或者fasta，实际就是注释一行，蛋白序列一行。<br>
+例子：<br>
+```
+cd /data/Xianjinyuan/LD_lab/databases/SCFA
+diamond makedb --in acetate_protein.fasta --db acetate_protein
+diamond makedb --in butyrate_protein.fasta --db butyrate_protein
+diamond makedb --in propionate_protein.fasta --db propionate_protein
+```
 
 ## 注意事项
 
 ## 测试数据例子
+
+## 后续需要测试和改良的地方
+1. 目前blastp用的参数是--max-target-seqs 1，而不是-max_hsps 1，可能会对结果有影响，需要进一步核对
+2. 数据库需要进一步补充并整理到公有库
