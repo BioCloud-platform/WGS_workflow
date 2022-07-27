@@ -19,7 +19,7 @@ WGS_SOP_2022.06.30.docx，但是里面不少步骤没有整合，还需要另外
 10）抗性基因：<br>
 &emsp;a）抗生素抗性：RGI<br>
 &emsp;b）抗噬菌体抗性：PADLOC<br>
-&emsp;c) CRISPR：CRSPRDetect【这个先不加】<br>
+&emsp;c) CRISPR：CRSPRDetect【这个先不加】，或CRISPRCasFinder（https://github.com/dcouvin/CRISPRCasFinder ，待玉灿补充）<br>
 11) 水平转移:<br>
 &emsp;a) digIS转座酶(insertion sequence elements)注释 【待玉灿补充】：<br>
 &emsp;b) mgefinder【这个先不加】<br>
