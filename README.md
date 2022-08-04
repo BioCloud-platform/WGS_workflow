@@ -30,7 +30,8 @@ WGS_SOP_2022.06.30.docx，但是里面不少步骤没有整合，还需要另外
 &emsp;c）蛋白的细胞内定位：psortb 【这个先不加】<br>
 &emsp;d）转运蛋白（TCDB） 【这个先不加】<br>
 &emsp;e）病原菌与宿主：PHI 【这个先不加】<br>
-&emsp;d）未来待补充的：耐酸耐碱耐氧、细菌凝集素、革兰氏阴阳性【还需要调研】<br>
+&emsp;f）未来待补充的：耐酸耐碱耐氧、细菌凝集素、革兰氏阴阳性【还需要调研】<br>
+&emsp;g）未来待补充邓晔组：氮循环基因数据库NcycFunGen、芳香族化合物降解的微生物标记基因ARHDs（https://mp.weixin.qq.com/s/hP8-JNXU84CFnM3qOYGyBw）【还需要调研】<br>
 13) 基因簇分析：<br>
 &emsp;a）antiSMASH：次级代谢基因簇（BGC）注释<br>
 &emsp;b）gutSMASH：肠道菌初级代谢基因簇（MGC）注释<br>
