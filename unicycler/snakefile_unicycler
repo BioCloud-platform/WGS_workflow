@@ -1,0 +1,26 @@
+configfile: "./config.yaml"
+
+import os
+
+outputdir = config["output"]
+FASTQdir = config["FASTQ"]
+samples = config["samples"]
+
+rule all:
+  input:
+    expand(os.path.join(outputdir, "unicycler", "{sample}"), sample = samples)
+
+# Assembly
+rule unicycler:
+  input:
+    r1 = os.path.join(FASTQdir, "".join(["{sample}.", str(config["fqext1"]), ".", str(config["fqsuffix"]), ".gz"])),  
+    r2 = os.path.join(FASTQdir, "".join(["{sample}.", str(config["fqext2"]), ".", str(config["fqsuffix"]), ".gz"]))
+  output:
+    directory(os.path.join(outputdir, "unicycler", "{sample}"))
+  singularity:
+    "docker://staphb/unicycler:0.5.0"
+  threads:
+    config["ncores"]
+  shell:
+    "unicycler -t {threads} -1 {input.r1} -2 {input.r2} -o {output}"
+
