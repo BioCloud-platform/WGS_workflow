@@ -1,0 +1,23 @@
+configfile: "./config.yaml"
+
+outputdir = config["output"]
+FASTQdir = config["FASTQ"]
+sample = config["samples"]
+
+rule all:
+  input:
+    expand(os.path.join(outputdir, "PhiSpy", "{sample}"), sample = sample),
+    
+# Annotation
+rule PhiSpy:
+  input:
+    os.path.join(outputdir, "prokka/{sample}/{sample}.gbk")
+  output:
+    directory(os.path.join(outputdir, "PhiSpy", "{sample}"))
+  singularity:
+    "docker://multifractal/phispy:v4.2.19"
+  threads:
+    config["ncores"]
+  shell:
+    "PhiSpy.py {input} -o {output} --threads {threads}" # input file in gene bank format (from prokka)
+

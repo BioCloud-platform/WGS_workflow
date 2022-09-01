@@ -1,0 +1,22 @@
+configfile: "./config.yaml"
+
+outputdir = config["output"]
+FASTQdir = config["FASTQ"]
+samples = config["samples"]
+
+rule all:
+  input:
+    expand(os.path.join(outputdir, "checkM_new", "{sample}"), sample = samples)
+
+rule checkM:
+  input:
+    os.path.join(outputdir, "unicycler", "{sample}")
+  output:
+    folder=directory(os.path.join(outputdir, "checkM_new", "{sample}")),
+    log_out=os.path.join(outputdir, "checkM_new", "{sample}.checkm.out")
+  singularity:
+    "docker://sstevens/checkm:latest"
+  threads:
+    config["ncores"]
+  shell:
+    "checkm lineage_wf -t {threads} -x fasta {input} {output.folder}> {output.log_out}"

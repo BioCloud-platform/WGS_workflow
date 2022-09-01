@@ -1,0 +1,21 @@
+configfile: "./config.yaml"
+
+outputdir = config["output"]
+FASTQdir = config["FASTQ"]
+sample = config["samples"]
+
+rule all:
+  input:
+    expand(os.path.join(outputdir, "GTDB", "{sample}"), sample = sample)    
+
+rule GTDB:
+  input:
+    os.path.join(outputdir, "unicycler", "{sample}")
+  output:
+    directory(os.path.join(outputdir, "GTDB", "{sample}"))
+  singularity:
+    "docker://ecogenomic/gtdbtk:2.1.1"
+  threads:
+    config["ncores"]
+  shell:
+    "gtdbtk classify_wf --genome_dir {input} --out_dir {output} --extension fa --cpus {threads}"

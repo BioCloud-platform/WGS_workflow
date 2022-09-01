@@ -1,0 +1,24 @@
+configfile: "./config.yaml"
+
+outputdir = config["output"]
+FASTQdir = config["FASTQ"]
+sample = config["samples"]
+
+rule all:
+  input:
+    expand(os.path.join(outputdir, "prokka/{sample}/{sample}.gbk"), sample = sample)
+
+# Annotation
+rule prokka:
+  input:
+    os.path.join(outputdir, "unicycler/{sample}/assembly.fasta")
+  output:
+    os.path.join(outputdir, "prokka/{sample}/{sample}.gbk")
+  params:
+    output_dir = os.path.join(outputdir, "prokka/{sample}"),
+  singularity:
+    "docker://staphb/prokka:1.14.5"
+  threads:
+    config["ncores"]
+  shell:
+    "prokka --addgenes --outdir {params.output_dir} --prefix {wildcards.sample} --force --cpus {threads} {input}"

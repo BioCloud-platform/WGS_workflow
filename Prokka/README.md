@@ -8,7 +8,20 @@ prodigal是基因组上ORF的预测的主流工具，使用动态规划算法，
 prokka.pptx
 
 ## 代码例子
+```
+prokka --addgenes --outdir {outpath} --prefix {sample_name} --force --cpus {threads} {input} #add prefix to control the output name, or it will be the date, which is hard to connect to the downstream analysis
+```
+
+## snakemake的格式
+```
+#根据具体情况修改config.yaml
+#然后就直接运行snakefile_prokka
+#例子，注路径要根据实际情况修改。
+conda activate snakemake
+cd /nasdir/xinyi/202207-SZChildrenHospital/script
+snakemake -s snakefile_prokka -c 8 --use-singularity --singularity-args "--bind /nasdir/xinyi" #此处没使用cluster，需要的话要加相关参数；--singularity-args是为了识别上层目录的内容
+#当前逻辑是每个样品分别跑
+```
 
 ## 注意事项
 
-## 测试数据例子

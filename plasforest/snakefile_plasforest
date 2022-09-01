@@ -1,0 +1,24 @@
+configfile: "./config.yaml"
+
+outputdir = config["output"]
+FASTQdir = config["FASTQ"]
+sample = config["samples"]
+
+rule all:
+  input:
+    expand(os.path.join(outputdir, "plasforest", "{sample}_plasforest.csv"), sample = sample),
+
+# Annotation
+rule plasforest:
+  input:
+    os.path.join(outputdir, "unicycler/{sample}/assembly.fasta")
+  output:
+    os.path.join(outputdir, "plasforest", "{sample}_plasforest.csv")
+  singularity:
+    "docker://dbest/plasforest:v1.0"
+  threads:
+    config["ncores"]
+  shell:
+    "cd /PlasForest/; ls; python3 PlasForest.py --threads {threads} -i {input} -o {output} -v"
+
+

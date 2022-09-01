@@ -15,8 +15,12 @@ unicycler -1 二代R1 -2 二代R2 -o 输出目录 -t 60 --spades_path spades.py�
 unicycler -1 "/home/shenjuntao/Rawdata/gutbacteria_rawdata/8_GutBacteria_WGS_SJT/8_bacteria_WGS_SJT/clean_data/CSC8_R1.fq.gz" -2 "/home/shenjuntao/Rawdata/gutbacteria_rawdata/8_GutBacteria_WGS_SJT/8_bacteria_WGS_SJT/clean_data/CSC8_R2.fq.gz" -o /home/shenjuntao/nanopore/data/20220602-00163_nanopore_20220602/CSC8_short -t 60 --spades_path /home/shenjuntao/nanopore/spades/SPAdes-3.15.4-Linux/bin/spades.py
 ```
 
-## 后续还需要改成snakemake的格式
+## snakemake的格式
 ```
 #根据具体情况修改config.yaml
 #然后就直接运行snakefile_unicycler（纯二代）。如果有三代数据，还需要相应修改。
+#例子，注路径要根据实际情况修改。
+conda activate snakemake
+cd /nasdir/xinyi/202207-SZChildrenHospital/script
+snakemake -s snakefile_unicycler -c 8 --use-singularity --singularity-args "--bind /nasdir/xinyi" #此处没使用cluster，需要的话要加相关参数；--singularity-args是为了识别上层目录的内容
 ```
