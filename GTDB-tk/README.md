@@ -11,7 +11,9 @@ GTDB-tk.pptx
 ## 数据库下载(v2.1.1对应)
 ```
 wget -c https://data.ace.uq.edu.au/public/gtdb/data/releases/release207/207.0/auxillary_files/gtdbtk_r207_v2_data.tar.gz
+tar -zxvf gtdbtk_r207_v2_data.tar.gz
 ```
+路径例子：/nasdir/xinyi/3-databases/gtdbtk
 
 ## 代码例子
 conda activate /home/chenjunyu/miniconda3/envs/gtdbtk 
@@ -19,7 +21,10 @@ gtdbtk classify_wf --genome_dir fna/ --out_dir classify_wf --extension fna --cpu
 
 ## 注意事项
 注意：每个gtdbtk的环境，会固定对应某个gtdb的版本，注意不要弄混了。
+
 该软件不支持另外指定数据库路径，但是可以通过环境变量进行设定
+
+文件夹里的目标输入文件（如fasta)的后缀名字一定要跟其他文件的后缀名区分开，不然会识别错误报错。
 
 ## 数据库指定
 ### docker形式，实际上就是把数据库路径指定到docker的/refdata
@@ -41,7 +46,7 @@ vim /conda/envs/gtdbtk/etc/conda/activate.d/gtdbtk.sh
 #例子，注路径要根据实际情况修改。
 conda activate snakemake
 cd /nasdir/xinyi/202207-SZChildrenHospital/script
-snakemake -s snakefile_gtdb -c 8 --use-singularity --singularity-args "--bind /nasdir/xinyi" #此处没使用cluster，需要的话要加相关参数；--singularity-args是为了识别上层目录的内容
+snakemake -s snakefile_gtdb -c 8 --use-singularity --singularity-args "--bind /nasdir/xinyi --bind /nasdir/xinyi/3-databases/gtdbtk/release207_v2/:/refdata/" #此处没使用cluster，需要的话要加相关参数；--singularity-args是为了识别上层目录的内容
 #当前逻辑是每个样品分别跑
 ```
 

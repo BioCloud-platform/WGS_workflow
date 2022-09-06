@@ -14,4 +14,19 @@ python /home/licun/biosoft/digIS-digISv1.2/digIS_search.py -i sequence.fna -g an
 ```
 ## 注意事项
 
-## 测试数据例子
+## snakemake的格式
+```
+#根据具体情况修改config.yaml
+#然后就直接运行snakefile_digIS
+#例子，注路径要根据实际情况修改。
+conda activate snakemake
+cd /nasdir/xinyi/202207-SZChildrenHospital/script
+snakemake -s snakefile_digIS -c 8 --use-singularity --singularity-args "--bind /nasdir/xinyi" #此处没使用cluster，需要的话要加相关参数；--singularity-args是为了识别上层目录的内容
+#当前逻辑是每个样品分别跑，然后最后通过combine.sh把两类结果都合并起来。
+```
+
+其中，通过singularity shell可以进入sif去看具体执行命令的路径
+
+
+## 似乎程序内部有bug，暂时不处理了
+ValueError: GRange: start or end position is out of the range.

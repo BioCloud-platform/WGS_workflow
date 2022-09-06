@@ -1,0 +1,43 @@
+configfile: "./config.yaml"
+
+outputdir = config["output"]
+FASTQdir = config["FASTQ"]
+sample = config["samples"]
+
+rule all:
+  input:
+    expand(os.path.join(outputdir, "PADLOC", "{sample}", "assembly.fasta_padloc.csv"), sample = sample),
+    expand(os.path.join(outputdir, "PADLOC", "{sample}", "assembly.fasta_padloc_sample.csv"), sample = sample),
+    os.path.join(outputdir, "PADLOC", "PADLOC_merged.csv"),
+    
+# Annotation
+rule PADLOC:
+  input:
+    os.path.join(outputdir, "unicycler/{sample}/assembly.fasta")
+  output:
+    os.path.join(outputdir, "PADLOC", "{sample}", "assembly.fasta_padloc.csv")
+  params:
+    out_dir = directory(os.path.join(outputdir, "PADLOC", "{sample}/")),
+    database_dir = "/nasdir/xinyi/3-databases/padloc/v1.4.0/",
+  singularity:
+    "docker://yuxiangtan/padloc:v1.1.0"
+  threads:
+    config["ncores"]
+  shell:
+    "mkdir -p {params.out_dir}; padloc --fna {input} --outdir {params.out_dir} --cpu {threads} --data {params.database_dir}"
+
+rule add_sample_name:
+  input:
+    os.path.join(outputdir, "PADLOC", "{sample}", "assembly.fasta_padloc.csv")
+  output:
+    os.path.join(outputdir, "PADLOC", "{sample}", "assembly.fasta_padloc_sample.csv")
+  shell:
+    "sed 's/system.number/'{wildcards.sample}'/g' {input} > {output}" 
+
+rule out_merged:
+  input:
+    expand(os.path.join(outputdir, "PADLOC", "{sample}", "assembly.fasta_padloc_sample.csv"), sample = sample),
+  output:
+    os.path.join(outputdir, "PADLOC", "PADLOC_merged.csv")
+  shell:
+    "cat {input} > {output}" 

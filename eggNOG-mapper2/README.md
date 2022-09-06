@@ -11,15 +11,25 @@ download_eggnog_data.py #需要手动选择y
 #如果提醒无法访问目标目录，需要自己提前创建。总数据库大小超过10G
 #如果要强制执行，可以用-y选项
 download_eggnog_data.py --data_dir {数据库路径} -y  
+download_eggnog_data.py --data_dir {数据库路径} -y -P #下载pfam，不是必须
+download_eggnog_data.py --data_dir {数据库路径} -y -M #下载MMseq2，不是必须
+download_eggnog_data.py --data_dir {数据库路径} -y -H -d taxid #下载HMMER对应taxid
 ```
 对应的docker版本是：docker://dataspott/eggnog-mapper:2.1.8--2022-07-11
+
+参考资料：https://blog.csdn.net/woodcorpse/article/details/83144768
 
 ## 代码例子
 ```
 conda activate eggnog-mapper=2.1.8
-emapper.py -i {input} --output {output} -d bact --usemem --cpu {threads} --data_dir {数据库路径}
+emapper.py -i {input} --itype {type} --output {output} -d bact --usemem --cpu {threads} --data_dir {数据库路径}
 ```
+
+例子路径：/nasdir/xinyi/3-databases/eggnog2/v2.1.8，使用时需要用 --data_dir 参数来指定
+
 ## 注意事项
+根据输入的类型不同，需要设置--itype， {CDS,proteins,genome,metagenome} ，默认是proteins
+
 
 ## 输出结果的格式
 ```
@@ -29,13 +39,13 @@ emapper.py -i {input} --output {output} -d bact --usemem --cpu {threads} --data_
 ## snakemake的格式
 ```
 #根据具体情况修改config.yaml
-#然后就直接运行snakefile_checkm
+#然后就直接运行snakefile_eggnog
 #例子，注路径要根据实际情况修改。
 conda activate snakemake
 cd /nasdir/xinyi/202207-SZChildrenHospital/script
-snakemake -s snakefile_checkm -c 8 --use-singularity --singularity-args "--bind /nasdir/xinyi" #此处没使用cluster，需要的话要加相关参数；--singularity-args是为了识别上层目录的内容
-#当前逻辑是每个样品分别跑，然后最后通过combine.sh把两类结果都合并起来。
+snakemake -s snakefile_eggnog -c 8 --use-singularity --singularity-args "--bind /nasdir/xinyi" #此处没使用cluster，需要的话要加相关参数；--singularity-args是为了识别上层目录的内容
+#当前逻辑是每个样品分别跑，且输入用的组装的fa
+
+#后续也会尝试用prokka的CDS，输入和--itype都要修改
 ```
 
-## 参考资料：
-https://blog.csdn.net/woodcorpse/article/details/83144768

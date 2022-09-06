@@ -1,0 +1,22 @@
+configfile: "./config.yaml"
+
+outputdir = config["output"]
+FASTQdir = config["FASTQ"]
+sample = config["samples"]
+
+rule all:
+  input:
+    expand(os.path.join(outputdir, "antismash", "{sample}"), sample = sample),
+
+# Annotation
+rule antiSMASH:
+  input:
+    os.path.join(outputdir, "unicycler/{sample}/assembly.fasta")
+  output:
+    directory(os.path.join(outputdir, "antismash", "{sample}"))
+  singularity:
+    "docker://antismash/standalone:6.1.1"
+  threads:
+    config["ncores"]
+  shell:
+    "antismash --cb-general --cb-knownclusters --cb-subclusters --asf --pfam2go --smcog-trees --genefinding-tool prodigal --output-dir {output} -c {threads} {input}"

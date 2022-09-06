@@ -1,0 +1,32 @@
+configfile: "./config.yaml"
+
+outputdir = config["output"]
+FASTQdir = config["FASTQ"]
+sample = config["samples"]
+
+rule all:
+  input:
+    expand(os.path.join(outputdir, "CAZy", "{sample}"), sample = sample),
+    os.path.join(outputdir, "CAZy", "cazy_final_out.csv"),
+
+# Annotation
+rule CAZy:
+  input:
+    os.path.join(outputdir, "unicycler/{sample}/assembly.fasta")
+  output:
+    directory(os.path.join(outputdir, "CAZy", "{sample}"))
+  singularity:
+    "docker://haidyi/run_dbcan:3.0.1"
+  threads:
+    config["ncores"]
+  shell:
+    "run_dbcan {input} prok --out_dir {output} --db_dir /nasdir/xinyi/3-databases/CAZy/v11-20220806"
+
+rule CAZy_merge:
+  input:
+    dbcanDir=directory(os.path.join(outputdir, "CAZy"))
+  output:
+    merge_file=os.path.join(outputdir, "CAZy", "cazy_final_out.csv")
+  script:
+    "assign_dbcan_snakemake.py"
+

@@ -86,3 +86,21 @@ conda install -c bioconda seqkit
 ## Other similar script versions
 
 In SimStr, the vfdb_anno.py is the frozen version at 2022-05-23
+
+
+## snakemake的格式
+```
+#根据具体情况修改config.yaml
+#然后就直接运行snakefile_VFDB
+#例子，注路径要根据实际情况修改。
+conda activate snakemake
+cd /nasdir/xinyi/202207-SZChildrenHospital/script
+snakemake -s snakefile_VFDB -c 8 --use-singularity --singularity-args "--bind /nasdir/xinyi" #此处没使用cluster，需要的话要加相关参数；--singularity-args是为了识别上层目录的内容
+#当前逻辑是每个样品分别跑，然后在每行行首加样品名样品名，最后进行合并就可以获取汇总表格。
+```
+当前用的是直接diamond blastp，而非上面的blastp_func_anno.py ，后面可能还是需要进一步改良。
+
+## 结果解读：文件本身没header。
+具体header信息见：https://www.metagenomics.wiki/tools/blast/blastn-output-format-6
+
+主要有用的就是第二列的VFDB-ID，后面的参数值，感觉基本上都肯定是没问题的（起码一般的阈值是过了的）。

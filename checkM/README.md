@@ -21,5 +21,5 @@ CheckM会把完整度和污染度等结果输出到屏幕，因此为了保存�
 conda activate snakemake
 cd /nasdir/xinyi/202207-SZChildrenHospital/script
 snakemake -s snakefile_checkm -c 8 --use-singularity --singularity-args "--bind /nasdir/xinyi" #此处没使用cluster，需要的话要加相关参数；--singularity-args是为了识别上层目录的内容
-#当前逻辑是每个样品分别跑，然后最后通过combine.sh把两类结果都合并起来。
+#当前逻辑是每个样品分别跑，在每个log前面先输入样品名字，然后最后通过snakemake把out结果合并起来。storage里的bin_stats.analyze.tsv没有合并，因为信息跟quast基本是一样的。
 ```

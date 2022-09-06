@@ -6,18 +6,39 @@ sample = config["samples"]
 
 rule all:
   input:
-    expand(os.path.join(outputdir, "PhiSpy", "{sample}"), sample = sample),
+    #expand(os.path.join(outputdir, "PhiSpy", "{sample}"), sample = sample),
+    expand(os.path.join(outputdir, "PhiSpy", "{sample}", "prophage_coordinates.tsv"), sample = sample),
+    expand(os.path.join(outputdir, "PhiSpy", "{sample}", "prophage_coordinates_sample.tsv"), sample = sample),
+    os.path.join(outputdir, "PhiSpy", "merged.tsv"),
     
 # Annotation
 rule PhiSpy:
   input:
     os.path.join(outputdir, "prokka/{sample}/{sample}.gbk")
   output:
+    os.path.join(outputdir, "PhiSpy", "{sample}", "prophage_coordinates.tsv")
+  params:
     directory(os.path.join(outputdir, "PhiSpy", "{sample}"))
   singularity:
     "docker://multifractal/phispy:v4.2.19"
   threads:
     config["ncores"]
   shell:
-    "PhiSpy.py {input} -o {output} --threads {threads}" # input file in gene bank format (from prokka)
+    "PhiSpy.py {input} -o {params} --threads {threads}" # input file in gene bank format (from prokka)
+
+rule PhiSpy_add_sample_name:
+  input:
+    os.path.join(outputdir, "PhiSpy", "{sample}", "prophage_coordinates.tsv")
+  output:
+    os.path.join(outputdir, "PhiSpy", "{sample}", "prophage_coordinates_sample.tsv")
+  shell:
+    "sed 's/pp/'{wildcards.sample}'|/g' {input} > {output}" 
+
+rule PhiSpy_merged:
+  input:
+    expand(os.path.join(outputdir, "PhiSpy", "{sample}", "prophage_coordinates_sample.tsv"), sample = sample),
+  output:
+    os.path.join(outputdir, "PhiSpy", "merged.tsv")
+  shell:
+    "cat {input} > {output}" 
 

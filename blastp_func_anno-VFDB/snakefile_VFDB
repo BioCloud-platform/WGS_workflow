@@ -1,0 +1,42 @@
+configfile: "./config.yaml"
+
+outputdir = config["output"]
+FASTQdir = config["FASTQ"]
+sample = config["samples"]
+
+rule all:
+  input:
+    expand(os.path.join(outputdir, "VFDB", "{sample}_vf_anno.txt"), sample = sample),
+    expand(os.path.join(outputdir, "VFDB", "{sample}_vf_sample_anno.txt"), sample = sample),
+    os.path.join(outputdir, "VFDB", "VFDB_merged.csv"),
+
+# Annotation
+rule VFDB:
+  input:
+    os.path.join(outputdir, "unicycler/{sample}/assembly.fasta")
+  output:
+    os.path.join(outputdir, "VFDB", "{sample}_vf_anno.txt")
+  singularity:
+    "docker://nanozoo/diamond:2.0.9--3b48005"
+  threads:
+    config["ncores"]
+  params:
+    db = config["vfdb_index"]
+  shell:
+    "diamond blastp --db {params.db} --query {input} --out {output} --threads {threads}"
+
+rule add_sample_name:
+  input:
+    os.path.join(outputdir, "VFDB", "{sample}_vf_anno.txt")
+  output:
+    os.path.join(outputdir, "VFDB", "{sample}_vf_sample_anno.txt")
+  shell:
+    "sed 's/^/'{wildcards.sample}'|&/g' {input} > {output}" #在每行行首加样品名
+
+rule out_merged:
+  input:
+    expand(os.path.join(outputdir, "VFDB", "{sample}_vf_sample_anno.txt"), sample = sample),
+  output:
+    os.path.join(outputdir, "VFDB", "VFDB_merged.csv")
+  shell:
+    "cat {input} > {output}" 

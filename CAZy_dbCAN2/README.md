@@ -9,6 +9,7 @@
 1. seqtk从基因序列生成可能的6种蛋白序列；如果输入的是prokka的faa文件，则应该跳过（通过-p参数设置）
 2. 使用dbcan2，对蛋白序列进行三种方法的注释
 3. 对注释结果进行整理：只有2种或以上方法都注释的才考虑。其中，最优先使用HMMER的结果，其次是Hotpep的结果，DIAMOND的结果不被考虑。【这个需要检查 一下逻辑】
+4. 最新版本的dbCAN，似乎不用Hotpep，而是用了eCAMI（适合EC对应的，和CAZY注释其实没什么关系），导致其结果可读性很奇怪。
 
 
 
@@ -114,8 +115,51 @@ cd /data/Xianjinyuan/LD_lab/databases/CAZy_dbCAN2_db/dbCAN2_db_2021_03_15/ \
 
 see [Index of /dbCAN2/download (unl.edu)](https://bcb.unl.edu/dbCAN2/download/) for updates and instructions
 
+v11
+```
+cd /nasdir/xinyi/3-databases/CAZy/v11-20220806
+wget http://bcb.unl.edu/dbCAN2/download/Databases/V11/CAZyDB.08062022.fa \
+    && wget https://bcb.unl.edu/dbCAN2/download/Databases/V11/dbCAN-HMMdb-V11.txt && mv dbCAN-HMMdb-V11.txt dbCAN.txt && hmmpress dbCAN.txt \
+    && wget https://bcb.unl.edu/dbCAN2/download/Databases/V11/tcdb.fa \
+    && wget http://bcb.unl.edu/dbCAN2/download/Databases/V11/tf-1.hmm && hmmpress tf-1.hmm \
+    && wget http://bcb.unl.edu/dbCAN2/download/Databases/V11/tf-2.hmm && hmmpress tf-2.hmm \
+    && wget https://bcb.unl.edu/dbCAN2/download/Databases/V11/stp.hmm && hmmpress stp.hmm \
+    && cd ../ && wget http://bcb.unl.edu/dbCAN2/download/Samples/EscheriaColiK12MG1655.fna \
+    && wget http://bcb.unl.edu/dbCAN2/download/Samples/EscheriaColiK12MG1655.faa \
+    && wget http://bcb.unl.edu/dbCAN2/download/Samples/EscheriaColiK12MG1655.gff
+#因为中间有涉及建库的步骤,但是又不能用别的版本进行建库，所以必须使用docker进行构建
+singularity shell /nasdir/xinyi/202207-SZChildrenHospital/script/.snakemake/singularity/3550290a77877f1bf737eff7746e0a55.simg
+diamond makedb --in CAZyDB.08062022.fa -d CAZy 
+diamond makedb --in tcdb.fa -d tcdb
+```
+
 
 
 ## Other similar script versions
 
 In SimStr, the cazy_anno.py is the frozen version at 2022-05-23
+
+
+## 官方github：https://github.com/linnabrown/run_dbcan
+
+## snakemake的格式
+```
+#根据具体情况修改config.yaml
+#然后就直接运行snakefile_CAZy
+#例子，注路径要根据实际情况修改。
+conda activate snakemake
+cd /nasdir/xinyi/202207-SZChildrenHospital/script
+snakemake -s snakefile_CAZy -c 8 --use-singularity --singularity-args "--bind /nasdir/xinyi" #此处没使用cluster，需要的话要加相关参数；--singularity-args是为了识别上层目录的内容
+#当前逻辑是每个样品分别跑，然后最后assign_dbcan_snakemake.py脚本把注释结果整理的同时也加了样品信息。
+```
+
+目前只是直接用的dbCAN3，和上面提供的run_dbcan.py里的dbCAN不一样，3重比较是有的，但是Hotpep被换成eCAMI，就没法投票机制了。
+```
+V3.0.2: Added eCAMI tool, remove Hotpep from run_dbCAN;
+v2.0.11:Add ec number prediction to hotpep result;
+```
+见：https://github.com/linnabrown/run_dbcan/wiki/Update-information-Archive
+
+目前只有HMMER有结果的才会被使用，如果HMMER有结果，但是跟diamond不一样，也会被扔掉。
+
+貌似最后生成的cazy_final_out.csv里的conflict其实还不少。后续还要对这个文件进行进一步转换。
