@@ -6,16 +6,36 @@ sample = config["samples"]
 
 rule all:
   input:
-    expand(os.path.join(outputdir, "GTDB", "{sample}"), sample = sample)    
+    expand(os.path.join(outputdir, "GTDB", "{sample}", "gtdbtk.bac120.summary.tsv"), sample = sample),    
+    expand(os.path.join(outputdir, "GTDB", "{sample}", "gtdbtk.bac120.summary.tsv"), sample = sample),    
+    os.path.join(outputdir, "GTDB", "GTDB_merged.tsv"),    
 
 rule GTDB:
   input:
     os.path.join(outputdir, "unicycler", "{sample}")
   output:
+    os.path.join(outputdir, "GTDB", "{sample}", "gtdbtk.bac120.summary.tsv")
+  params:
     directory(os.path.join(outputdir, "GTDB", "{sample}"))
   singularity:
     "docker://ecogenomic/gtdbtk:2.1.1"
   threads:
     config["ncores"]
   shell:
-    "gtdbtk classify_wf --genome_dir {input} --out_dir {output} --extension fa --cpus {threads}"
+    "gtdbtk classify_wf --genome_dir {input} --out_dir {params} --extension fasta --cpus {threads}"
+
+rule add_sample_name:
+  input:
+    os.path.join(outputdir, "GTDB", "{sample}", "gtdbtk.bac120.summary.tsv")
+  output:
+    os.path.join(outputdir, "GTDB", "{sample}", "gtdbtk.bac120.summary_sample.tsv")
+  shell:
+    "sed 's/assembly/'{wildcards.sample}'/g' {input} > {output}" #因为用的是assembly.fasta
+
+rule out_merged:
+  input:
+    expand(os.path.join(outputdir, "GTDB", "{sample}", "gtdbtk.bac120.summary_sample.tsv"), sample = sample),
+  output:
+    os.path.join(outputdir, "GTDB", "GTDB_merged.tsv")
+  shell:
+    "cat {input} > {output}" 

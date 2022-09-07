@@ -104,7 +104,7 @@ final.to_csv(snakemake.output.merge_file, index=None)
 sampleList = list(df["SampleID"].unique())
 for sample in sampleList:
     df1 = pd.DataFrame()
-    df2 = final[df["SampleID"] == sample]
+    df2 = final[final["SampleID"] == sample]
     df1["GeneID"] = df2["GeneID"]
-    df1["CAZy"] = df2["cazy"]
+    df1["CAZy"] = df2["CAZy"]
     df1.to_csv(os.path.join(snakemake.input.dbcanDir, sample + ".csv"), index=None)

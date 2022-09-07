@@ -3,8 +3,12 @@ Pipelines used for WGS assembly using nanopore sequencing data.
 
 ## 运行环境
 建议conda装，最新版本0.5.0
+
 或者用make的方法装到docker里面
+
 不建议直接在自己账户下用make安装。
+
+docker: quay.io/biocontainers/unicycler:0.5.0--py310h2e03b76_0 或者 docker://staphb/unicycler:0.5.0
 
 ## 运行逻辑：
 unicycler -1 二代R1 -2 二代R2 -o 输出目录 -t 60 --spades_path spades.py所在路径<br>

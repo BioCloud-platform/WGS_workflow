@@ -1,0 +1,43 @@
+configfile: "./config.yaml"
+
+outputdir = config["output"]
+FASTQdir = config["FASTQ"]
+sample = config["samples"]
+
+rule all:
+  input:
+    expand(os.path.join(outputdir, "eggnog", "{sample}.emapper.annotations"), sample = sample),
+    expand(os.path.join(outputdir, "eggnog", "{sample}.sample.emapper.annotations"), sample = sample),
+    os.path.join(outputdir, "eggnog", "eggnog_merged.csv"),
+
+rule eggnog:
+  input:
+    os.path.join(outputdir, "unicycler", "{sample}/assembly.fasta")
+  output:
+    os.path.join(outputdir, "eggnog", "{sample}.emapper.annotations")
+    #directory(os.path.join(outputdir, "eggnog", "{sample}"))
+  params:
+    database_dir = "/nasdir/xinyi/3-databases/eggnog2/v2.1.8/",
+    out_prefix = os.path.join(outputdir, "eggnog", "{sample}"),
+  singularity:
+    "docker://dataspott/eggnog-mapper:2.1.8--2022-07-11"
+  threads:
+    config["ncores"]
+  shell:
+    "emapper.py -i {input} --itype genome --output {params.out_prefix} -d bact --usemem --cpu {threads} --data_dir {params.database_dir}"
+
+rule add_sample_name:
+  input:
+    os.path.join(outputdir, "eggnog", "{sample}.emapper.annotations")
+  output:
+    os.path.join(outputdir, "eggnog", "{sample}.sample.emapper.annotations")
+  shell:
+    "sed 's/\#query/'{wildcards.sample}'|query/g' {input} > {output}" 
+
+rule out_merged:
+  input:
+    expand(os.path.join(outputdir, "eggnog", "{sample}.sample.emapper.annotations"), sample = sample),
+  output:
+    os.path.join(outputdir, "eggnog", "eggnog_merged.csv")
+  shell:
+    "cat {input} > {output}" 

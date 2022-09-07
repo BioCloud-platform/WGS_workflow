@@ -47,7 +47,7 @@ vim /conda/envs/gtdbtk/etc/conda/activate.d/gtdbtk.sh
 conda activate snakemake
 cd /nasdir/xinyi/202207-SZChildrenHospital/script
 snakemake -s snakefile_gtdb -c 8 --use-singularity --singularity-args "--bind /nasdir/xinyi --bind /nasdir/xinyi/3-databases/gtdbtk/release207_v2/:/refdata/" #此处没使用cluster，需要的话要加相关参数；--singularity-args是为了识别上层目录的内容
-#当前逻辑是每个样品分别跑
+#当前逻辑是每个样品分别跑,然后通过把每个gtdbtk.bac120.summary.tsv里的(#因为用的是assembly.fasta)替换成样品名，最后进行合并就可以获取汇总表格。
 ```
 
 
