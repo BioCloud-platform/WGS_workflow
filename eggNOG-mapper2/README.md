@@ -13,7 +13,7 @@ download_eggnog_data.py #需要手动选择y
 download_eggnog_data.py --data_dir {数据库路径} -y  
 download_eggnog_data.py --data_dir {数据库路径} -y -P #下载pfam，不是必须
 download_eggnog_data.py --data_dir {数据库路径} -y -M #下载MMseq2，不是必须
-download_eggnog_data.py --data_dir {数据库路径} -y -H -d taxid #下载HMMER对应taxid
+download_eggnog_data.py --data_dir {数据库路径} -y -H -d taxid #下载HMMER对应taxid,要给具体的，如Bacteria是2，Archaea是2157，Eukaryota是2759，目前这三个都下了
 ```
 对应的docker版本是：docker://dataspott/eggnog-mapper:2.1.8--2022-07-11
 
@@ -44,8 +44,14 @@ emapper.py -i {input} --itype {type} --output {output} -d bact --usemem --cpu {t
 conda activate snakemake
 cd /nasdir/xinyi/202207-SZChildrenHospital/script
 snakemake -s snakefile_eggnog -c 8 --use-singularity --singularity-args "--bind /nasdir/xinyi" #此处没使用cluster，需要的话要加相关参数；--singularity-args是为了识别上层目录的内容
-#当前逻辑是每个样品分别跑，且输入用的组装的fa
+#当前逻辑是每个样品分别跑，且输入用的组装的fa，然后通过把每个.emapper.annotations里的#query替换成样品名，最后进行合并就可以获取汇总表格。
 
 #后续也会尝试用prokka的CDS，输入和--itype都要修改
 ```
 
+## 结果解读。
+主要有用的列：COG_category、GOs、EC、KEGG_ko、KEGG_Pathway、KEGG_Module、KEGG_Reaction、KEGG_rclass、BRITE、KEGG_TC、CAZy（和CAZy的）、BiGG_Reaction、PFAMs
+
+但是整体结果来看，感觉eggNog的结果其实并不是太好解读和批量整理。
+
+下游富集分析参考思路：https://cloud.tencent.com/developer/article/1607669
