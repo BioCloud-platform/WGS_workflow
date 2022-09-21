@@ -4,7 +4,7 @@ import numpy
 #file_in="eggnog_merged.tsv"
 file_in=snakemake.input.merge_file
 #file_out_head="eggnog_merged_reshape"
-file_out=snakemake.params.table_file
+file_out_head=snakemake.params.table_file
 
 df_ori = pandas.read_csv(file_in,dtype=str,sep="\t",header=None) 
 df_ori.columns = ["qID",'seed_ortholog','evalue','score','eggNOG_OGs','max_annot_lvl','COG_category','Description','Preferred_name','GOs','EC','KEGG_ko','KEGG_Pathway','KEGG_Module','KEGG_Reaction','KEGG_rclass','BRITE','KEGG_TC','CAZy','BiGG_Reaction','PFAMs']
