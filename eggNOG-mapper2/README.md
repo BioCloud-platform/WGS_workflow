@@ -50,7 +50,7 @@ snakemake -s snakefile_eggnog -c 8 --use-singularity --singularity-args "--bind 
 ```
 
 ## 结果解读。
-主要有用的列：COG_category、GOs、EC、KEGG_ko、KEGG_Pathway、KEGG_Module、KEGG_Reaction、KEGG_rclass、BRITE、KEGG_TC、CAZy（和CAZy的对比？估计不一样）、BiGG_Reaction、PFAMs
+主要有用的列：COG_category、GOs、EC、KEGG_ko、KEGG_Pathway、KEGG_Module、KEGG_Reaction、KEGG_rclass、BRITE、KEGG_TC、CAZy（和CAZy的对比？估计不一样,CAZy的结果有67条，而eggnog只有36，所以不使用）、BiGG_Reaction、PFAMs
 
 通过汇总表格分析，
 
