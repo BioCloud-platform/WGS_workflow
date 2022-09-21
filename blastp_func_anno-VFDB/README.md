@@ -96,7 +96,8 @@ In SimStr, the vfdb_anno.py is the frozen version at 2022-05-23
 conda activate snakemake
 cd /nasdir/xinyi/202207-SZChildrenHospital/script
 snakemake -s snakefile_VFDB -c 8 --use-singularity --singularity-args "--bind /nasdir/xinyi" #此处没使用cluster，需要的话要加相关参数；--singularity-args是为了识别上层目录的内容
-#当前逻辑是每个样品分别跑，然后在每行行首加样品名样品名，最后进行合并就可以获取汇总表格。
+#当前逻辑是每个样品分别跑，然后在每行行首加样品名样品名，最后进行VFDB_merged_table_2_sample.py合并就可以获取汇总表格。
+##汇总表格里的数值是score，另外也有定量表和定性表
 ```
 当前用的是直接diamond blastp，而非上面的blastp_func_anno.py ，后面可能还是需要进一步改良。
 

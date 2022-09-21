@@ -1,0 +1,102 @@
+configfile: "./config.yaml"
+
+outputdir = config["output"]
+FASTQdir = config["FASTQ"]
+sample = config["samples"]
+sample_num = str(len(sample))
+
+rule all:
+  input:
+    expand(os.path.join(outputdir, "RGI", "{sample}.txt"), sample = sample),
+    expand(os.path.join(outputdir, "RGI", "{sample}_sample.txt"), sample = sample),
+    os.path.join(outputdir, "RGI", "RGI_merged.txt"),
+    os.path.join(outputdir, "RGI", "RGI_AMRgene_heatmap-"+sample_num+".eps"),
+    os.path.join(outputdir, "RGI", "RGI_DrugClass_heatmap-"+sample_num+".eps"),
+    os.path.join(outputdir, "RGI", "RGI_distribution_heatmap-"+sample_num+".eps"),
+    os.path.join(outputdir, "RGI", "RGI_resistance_mechanism_heatmap-"+sample_num+".eps"),
+
+# Annotation
+rule RGI:
+  input:
+    os.path.join(outputdir, "unicycler/{sample}/assembly.fasta")
+  output:
+    os.path.join(outputdir, "RGI", "{sample}.txt")
+  params:
+    database_dir = "/nasdir/xinyi/3-databases/CARD/card.json",
+    out_file = os.path.join(outputdir, "RGI", "{sample}"),
+  singularity:
+    #"docker://finlaymaguire/rgi:latest" #虽然官网上也有推荐，但是里面连BIO都不对的
+    "docker://quay.io/biocontainers/rgi:5.2.1--pyha8f3691_2"
+  threads:
+    config["ncores"]
+  shell:
+    "rgi database --version;rgi main -i {input} -o {params.out_file} --clean -n {threads}"
+
+rule add_sample_name:
+  input:
+    os.path.join(outputdir, "RGI", "{sample}.txt")
+  output:
+    os.path.join(outputdir, "RGI", "{sample}_sample.txt")
+  shell:
+    "sed 's/ORF_ID/'{wildcards.sample}'|ORF_ID/g' {input} > {output}" 
+
+rule out_merged:
+  input:
+    expand(os.path.join(outputdir, "RGI", "{sample}_sample.txt"), sample = sample),
+  output:
+    os.path.join(outputdir, "RGI", "RGI_merged.txt")
+  shell:
+    "cat {input} > {output}" 
+
+rule RGI_AMRgene_heatmap:
+  input:
+    input_dir = directory(os.path.join(outputdir, "RGI"))
+  output:
+    os.path.join(outputdir, "RGI", "RGI_AMRgene_heatmap-"+sample_num+".eps")
+  params:
+    out_file = os.path.join(outputdir, "RGI", "RGI_AMRgene_heatmap"),
+  singularity:
+    #"docker://finlaymaguire/rgi:latest" #虽然官网上也有推荐，但是里面连BIO都不对的
+    "docker://quay.io/biocontainers/rgi:5.2.1--pyha8f3691_2"
+  shell:
+    "rgi database --version;rgi heatmap --input {input.input_dir} --output {params.out_file} -cat gene_family -clus samples"
+
+rule RGI_DrugClass_heatmap:
+  input:
+    input_dir = directory(os.path.join(outputdir, "RGI"))
+  output:
+    os.path.join(outputdir, "RGI", "RGI_DrugClass_heatmap-"+sample_num+".eps")
+  params:
+    out_file = os.path.join(outputdir, "RGI", "RGI_DrugClass_heatmap"),
+  singularity:
+    #"docker://finlaymaguire/rgi:latest" #虽然官网上也有推荐，但是里面连BIO都不对的
+    "docker://quay.io/biocontainers/rgi:5.2.1--pyha8f3691_2"
+  shell:
+    "rgi database --version;rgi heatmap --input {input.input_dir} --output {params.out_file} -cat drug_class -clus samples"
+
+rule RGI_resistance_mechanism_heatmap:
+  input:
+    input_dir = directory(os.path.join(outputdir, "RGI"))
+  output:
+    os.path.join(outputdir, "RGI", "RGI_resistance_mechanism_heatmap-"+sample_num+".eps")
+  params:
+    out_file = os.path.join(outputdir, "RGI", "RGI_resistance_mechanism_heatmap"),
+  singularity:
+    #"docker://finlaymaguire/rgi:latest" #虽然官网上也有推荐，但是里面连BIO都不对的
+    "docker://quay.io/biocontainers/rgi:5.2.1--pyha8f3691_2"
+  shell:
+    "rgi database --version;rgi heatmap --input {input.input_dir} --output {params.out_file} -cat resistance_mechanism -clus samples"
+
+rule RGI_distribution_heatmap:
+  input:
+    input_dir = directory(os.path.join(outputdir, "RGI"))
+  output:
+    os.path.join(outputdir, "RGI", "RGI_distribution_heatmap-"+sample_num+".eps")
+  params:
+    out_file = os.path.join(outputdir, "RGI", "RGI_distribution_heatmap"),
+  singularity:
+    #"docker://finlaymaguire/rgi:latest" #虽然官网上也有推荐，但是里面连BIO都不对的
+    "docker://quay.io/biocontainers/rgi:5.2.1--pyha8f3691_2"
+  shell:
+    "rgi database --version;rgi heatmap --input {input.input_dir} --output {params.out_file} -clus both"
+

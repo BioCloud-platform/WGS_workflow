@@ -4,8 +4,10 @@
 貌似是目前唯一基于命令行的相关工具。
 
 ## 代码例子
-conda activate /home/licun/miniconda3/prophage <br>
+```
+conda activate /home/licun/miniconda3/prophage 
 PhiSpy.py -o outfile DA*.gbk --output_choice 512
+```
 
 ## snakemake的格式
 ```
@@ -15,7 +17,8 @@ PhiSpy.py -o outfile DA*.gbk --output_choice 512
 conda activate snakemake
 cd /nasdir/xinyi/202207-SZChildrenHospital/script
 snakemake -s snakefile_PhiSpy -c 8 --use-singularity --singularity-args "--bind /nasdir/xinyi" #此处没使用cluster，需要的话要加相关参数；--singularity-args是为了识别上层目录的内容
-#当前逻辑是每个样品分别跑，然后通过把每个prophage_coordinates.tsv里的pp替换成样品名，最后进行合并就可以获取汇总表格。
+#当前逻辑是每个样品分别跑，然后通过把每个prophage_coordinates.tsv里的pp替换成样品名，最后通过PhiSpy_merged_table_2_sample.py转换成汇总表格。
+## 汇总表内数值为预测的前噬菌体长度；行头是att左右位点串接的序列
 ```
 
 ## 注意事项
@@ -28,7 +31,8 @@ The columns of the file are:
 Prophage number #这个似乎并没有实际含义，就是排序而已（已经替换成样品名|编号的格式）
 The contig upon which the prophage resides
 The start location of the prophage
-The stop location of the prophage If we can detect the att sites, the additional columns are:
+The stop location of the prophage 
+If we can detect the att sites, the additional columns are:
 start of attL;
 end of attL;
 start of attR;

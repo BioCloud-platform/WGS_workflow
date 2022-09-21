@@ -8,7 +8,8 @@ rule all:
   input:
     expand(os.path.join(outputdir, "eggnog", "{sample}.emapper.annotations"), sample = sample),
     expand(os.path.join(outputdir, "eggnog", "{sample}.sample.emapper.annotations"), sample = sample),
-    os.path.join(outputdir, "eggnog", "eggnog_merged.csv"),
+    os.path.join(outputdir, "eggnog", "eggnog_merged.tsv"),
+    os.path.join(outputdir, "eggnog", "eggnog_merged_reshape_EC.csv"),
 
 rule eggnog:
   input:
@@ -32,12 +33,24 @@ rule add_sample_name:
   output:
     os.path.join(outputdir, "eggnog", "{sample}.sample.emapper.annotations")
   shell:
-    "sed 's/\#query/'{wildcards.sample}'|query/g' {input} > {output}" 
+    "grep -vE '^#|^$' {input} | sed 's/^/'{wildcards.sample}'|&/g' > {output}"#通过grep，先把废行排除掉
+    #"sed 's/\#query/'{wildcards.sample}'|query/g' {input} > {output}" 
 
 rule out_merged:
   input:
     expand(os.path.join(outputdir, "eggnog", "{sample}.sample.emapper.annotations"), sample = sample),
   output:
-    os.path.join(outputdir, "eggnog", "eggnog_merged.csv")
+    os.path.join(outputdir, "eggnog", "eggnog_merged.tsv")
   shell:
     "cat {input} > {output}" 
+
+
+rule merge_reshape:
+  input:
+    merge_file = os.path.join(outputdir, "eggnog", "eggnog_merged.tsv"),
+  output:
+    os.path.join(outputdir, "eggnog", "eggnog_merged_reshape_EC.csv")
+  params:
+    table_file = os.path.join(outputdir, "eggnog", "eggnog_merged_reshape"),
+  script:
+    "eggnog_merged_table_2_sample.py" 

@@ -10,6 +10,7 @@ rule all:
     expand(os.path.join(outputdir, "PhiSpy", "{sample}", "prophage_coordinates.tsv"), sample = sample),
     expand(os.path.join(outputdir, "PhiSpy", "{sample}", "prophage_coordinates_sample.tsv"), sample = sample),
     os.path.join(outputdir, "PhiSpy", "merged.tsv"),
+    os.path.join(outputdir, "PhiSpy", "PhiSpy_merged_reshape.csv"),
     
 # Annotation
 rule PhiSpy:
@@ -42,3 +43,10 @@ rule PhiSpy_merged:
   shell:
     "cat {input} > {output}" 
 
+rule PhiSpy_reshape:
+  input:
+    merge_file = os.path.join(outputdir, "PhiSpy", "merged.tsv"),
+  output:
+    table_file = os.path.join(outputdir, "PhiSpy", "PhiSpy_merged_reshape.csv")
+  script:
+    "PhiSpy_merged_table_2_sample.py" 

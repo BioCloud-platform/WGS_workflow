@@ -44,10 +44,10 @@ tar -xvf data ./card.json
 conda activate snakemake
 cd /nasdir/xinyi/202207-SZChildrenHospital/script
 snakemake -s snakefile_RGI -c 8 --use-singularity --singularity-args "--bind /nasdir/xinyi" #此处没使用cluster，需要的话要加相关参数；--singularity-args是为了识别上层目录的内容
-#当前逻辑是每个样品分别跑，然后通过把每个txt里的ORF_ID前加上样品名来识别，最后进行合并就可以获取汇总表格。
+#当前逻辑是每个样品分别跑，然后通过把每个txt里的ORF_ID前加上样品名来识别，最后进行合并。在尝试格式转换的时候发现，其Drug Class、Resistance Mechanism和AMR Gene Family似乎有可能多对多的关系，不是太方便整理，所以放弃。尤其是通过heatmap功能，其实rgi会帮忙生成整理的csv。所以最后通过heatmap功能直接产生图和表。
 ```
 
 注：当前用的是官网对应的biocontainer的5.2.1版。然后自带的card是3.1.4（2021-10-05版本，虽然目前似乎出到3.2.4了），但是docker里面无法简单进行更新（可能需要用root更新docker才可以，因为load的路径无法写入），因此无法用新的数据库版本。
 
 ## 结果解读
-当前生成了RGI_merged.csv，是所有输入样品的结果汇总。每个样品都有具体的header。
+当前生成了RGI_merged.csv，是所有输入样品的结果汇总。每个样品都有具体的header，这个只做为信息汇总表，最终有价值的表格分别是三个具体功能的csv。

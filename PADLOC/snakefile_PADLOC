@@ -9,6 +9,8 @@ rule all:
     expand(os.path.join(outputdir, "PADLOC", "{sample}", "assembly.fasta_padloc.csv"), sample = sample),
     expand(os.path.join(outputdir, "PADLOC", "{sample}", "assembly.fasta_padloc_sample.csv"), sample = sample),
     os.path.join(outputdir, "PADLOC", "PADLOC_merged.csv"),
+    os.path.join(outputdir, "PADLOC", "PADLOC_merged_reshape_system.csv"),
+    os.path.join(outputdir, "PADLOC", "PADLOC_merged_reshape_protein.csv"),
     
 # Annotation
 rule PADLOC:
@@ -32,7 +34,8 @@ rule add_sample_name:
   output:
     os.path.join(outputdir, "PADLOC", "{sample}", "assembly.fasta_padloc_sample.csv")
   shell:
-    "sed 's/system.number/'{wildcards.sample}'/g' {input} > {output}" 
+    "sed 's/^/'{wildcards.sample}'|&/g' {input} > {output}"
+    #"sed 's/system.number/system.number|'{wildcards.sample}'/g' {input} > {output}" 
 
 rule out_merged:
   input:
@@ -41,3 +44,12 @@ rule out_merged:
     os.path.join(outputdir, "PADLOC", "PADLOC_merged.csv")
   shell:
     "cat {input} > {output}" 
+
+rule merged_reshape:
+  input:
+    merge_file = os.path.join(outputdir, "PADLOC", "PADLOC_merged.csv"),
+  output:
+    table_file_sys = os.path.join(outputdir, "PADLOC", "PADLOC_merged_reshape_system.csv"),
+    table_file_protein = os.path.join(outputdir, "PADLOC", "PADLOC_merged_reshape_protein.csv"),
+  script:
+    "PADLOC_merged_table_2_sample.py" 

@@ -8,7 +8,8 @@ rule all:
   input:
     expand(os.path.join(outputdir, "VFDB", "{sample}_vf_anno.txt"), sample = sample),
     expand(os.path.join(outputdir, "VFDB", "{sample}_vf_sample_anno.txt"), sample = sample),
-    os.path.join(outputdir, "VFDB", "VFDB_merged.csv"),
+    os.path.join(outputdir, "VFDB", "VFDB_merged.tsv"),
+    os.path.join(outputdir, "VFDB", "VFDB_merged_reshape.csv")
 
 # Annotation
 rule VFDB:
@@ -37,6 +38,14 @@ rule out_merged:
   input:
     expand(os.path.join(outputdir, "VFDB", "{sample}_vf_sample_anno.txt"), sample = sample),
   output:
-    os.path.join(outputdir, "VFDB", "VFDB_merged.csv")
+    os.path.join(outputdir, "VFDB", "VFDB_merged.tsv")
   shell:
     "cat {input} > {output}" 
+
+rule merged_reshape:
+  input:
+    merge_file = os.path.join(outputdir, "VFDB", "VFDB_merged.tsv"),
+  output:
+    table_file = os.path.join(outputdir, "VFDB", "VFDB_merged_reshape.csv")
+  script:
+    "VFDB_merged_table_2_sample.py" 

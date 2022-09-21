@@ -38,9 +38,11 @@ from multiprocessing import Pool, freeze_support
 def parseDbcan(dbcanDir):
     filePathList = []
     frames = []
-    dirs = os.listdir(dbcanDir)
+    dirs = [dI for dI in os.listdir(dbcanDir) if os.path.isdir(os.path.join(dbcanDir,dI))]
+    #print(dirs)
     for dir in dirs:
         filePath = os.path.join(dbcanDir, dir, "overview.txt")
+        #print(filePath)
         if os.path.getsize(filePath) > 0:
             df_f=pd.read_table(filePath)
             df_f["SampleID"]=dir

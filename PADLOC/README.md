@@ -39,10 +39,10 @@ conda装的路径一般在padloc下，可以通过which padloc查看，例如查
 conda activate snakemake
 cd /nasdir/xinyi/202207-SZChildrenHospital/script
 snakemake -s snakefile_PADLOC -c 8 --use-singularity --singularity-args "--bind /nasdir/xinyi" #此处没使用cluster，需要的话要加相关参数；--singularity-args是为了识别上层目录的内容
-#当前逻辑是每个样品分别跑，然后通过把每个*_padloc.csv里的system.number替换成样品名，最后进行合并就可以获取汇总表格。
+#当前逻辑是每个样品分别跑，然后通过把每个*_padloc.csv里的行首增加样品名后进行cat合并，最后通过PADLOC_merged_table_2_sample.py把结果转换成汇总表格。
 ```
 
 ## 结果解读
 从全基因组的角度，padloc.csv文件就是核心输出。
 
-因此当前生成了PADLOC_merged.csv，是所有输入样品的结果汇总。
+因此当前生成了PADLOC_merged.csv，是所有输入样品的结果汇总，然后转换成两类表格：1.针对抗性system的表格（以system为列名，样品为行名，里面的value是gene ID），及其附属的定量及定性文件；2.针对具体的protein的表格（里面的格式通system，只是列名是protein层级的）

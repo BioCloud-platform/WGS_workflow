@@ -150,7 +150,7 @@ In SimStr, the cazy_anno.py is the frozen version at 2022-05-23
 conda activate snakemake
 cd /nasdir/xinyi/202207-SZChildrenHospital/script
 snakemake -s snakefile_CAZy -c 8 --use-singularity --singularity-args "--bind /nasdir/xinyi" #此处没使用cluster，需要的话要加相关参数；--singularity-args是为了识别上层目录的内容
-#当前逻辑是每个样品分别跑，然后最后assign_dbcan_snakemake.py脚本把注释结果整理的同时也加了样品信息。
+#当前逻辑是每个样品分别跑，然后最后assign_dbcan_snakemake.py脚本把注释结果整理的同时也加了样品信息,最后通过CAZy_merged_table_2_sample.py转换成样品对酶族的表格，可用于下游作图分析。
 ```
 
 目前只是直接用的dbCAN3，和上面提供的run_dbcan.py里的dbCAN不一样，3重比较是有的，但是Hotpep被换成eCAMI，就没法投票机制了。
@@ -162,4 +162,4 @@ v2.0.11:Add ec number prediction to hotpep result;
 
 目前只有HMMER有结果的才会被使用，如果HMMER有结果，但是跟diamond不一样，也会被扔掉。
 
-貌似最后生成的cazy_final_out.csv里的conflict其实还不少。后续还要对这个文件进行进一步转换。
+貌似最后生成的cazy_final_out.csv里的conflict其实还不少，目前并没有进行处理，相当于被扔掉了。

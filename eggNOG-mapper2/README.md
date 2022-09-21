@@ -50,8 +50,8 @@ snakemake -s snakefile_eggnog -c 8 --use-singularity --singularity-args "--bind 
 ```
 
 ## 结果解读。
-主要有用的列：COG_category、GOs、EC、KEGG_ko、KEGG_Pathway、KEGG_Module、KEGG_Reaction、KEGG_rclass、BRITE、KEGG_TC、CAZy（和CAZy的）、BiGG_Reaction、PFAMs
+主要有用的列：COG_category、GOs、EC、KEGG_ko、KEGG_Pathway、KEGG_Module、KEGG_Reaction、KEGG_rclass、BRITE、KEGG_TC、CAZy（和CAZy的对比？估计不一样）、BiGG_Reaction、PFAMs
 
-但是整体结果来看，感觉eggNog的结果其实并不是太好解读和批量整理。
+通过汇总表格分析，
 
 下游富集分析参考思路：https://cloud.tencent.com/developer/article/1607669
