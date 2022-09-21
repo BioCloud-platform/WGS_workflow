@@ -85,12 +85,12 @@ def clean_complex_columns(frame):
         new_frame.columns = sub_col
         new_frame.index = T_frame_row_names
         T_frame = pandas.concat([T_frame, new_frame], axis=1)
-    T_frame=T_frame[T_frame.columns.drop(out_col)]
     T_frame=remove_dup_columns(T_frame)
+    T_frame=T_frame[T_frame.columns.drop(out_col)] #对于大矩阵，这个似乎居然是个瓶颈，会跑非常非常久，有点难以理解.本来df_out_GOs10分钟内能跑完的，就是这个没先remove_dup_columns的话，跑了48小时都没跑完。
     T_frame=T_frame[T_frame.columns.drop("-")]
     return T_frame.T
 
-df_out_GOs=clean_complex_columns(df_out_GOs)
+df_out_GOs=clean_complex_columns(df_out_GOs) 
 
 #输出带index的df_out
 def df_out_write(df_out,file_out):
@@ -121,7 +121,7 @@ print("_EC done")
 df_out_KEGG_ko=clean_complex_columns(df_out_KEGG_ko)
 df_out_write(df_out_KEGG_ko,file_out_head+"_KEGG_ko")
 print("_KEGG_ko done")
-df_out_KEGG_Pathway=clean_complex_columns(df_out_KEGG_Pathway)
+df_out_KEGG_Pathway=clean_complex_columns(df_out_KEGG_Pathway) 
 df_out_write(df_out_KEGG_Pathway,file_out_head+"_KEGG_Pathway")
 print("_KEGG_Pathway done")
 df_out_KEGG_Module=clean_complex_columns(df_out_KEGG_Module)
@@ -133,7 +133,7 @@ print("_KEGG_Reaction done")
 df_out_KEGG_rclass=clean_complex_columns(df_out_KEGG_rclass)
 df_out_write(df_out_KEGG_rclass,file_out_head+"_KEGG_rclass")
 print("_KEGG_rclass done")
-df_out_BRITE=clean_complex_columns(df_out_BRITE)
+df_out_BRITE=clean_complex_columns(df_out_BRITE) 
 df_out_write(df_out_BRITE,file_out_head+"_BRITE")
 print("_BRITE done")
 df_out_KEGG_TC=clean_complex_columns(df_out_KEGG_TC)
