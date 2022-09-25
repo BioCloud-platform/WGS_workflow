@@ -40,6 +40,7 @@ vim /conda/envs/gtdbtk/etc/conda/activate.d/gtdbtk.sh
 ```
 
 ## snakemake的格式
+### 按每个样品分开跑，对应unicycler组装的方式
 ```
 #根据具体情况修改config.yaml
 #然后就直接运行snakefile_gtdb
@@ -50,5 +51,12 @@ snakemake -s snakefile_gtdb -c 8 --use-singularity --singularity-args "--bind /n
 #当前逻辑是每个样品分别跑,然后通过把每个gtdbtk.bac120.summary.tsv里的(#因为用的是assembly.fasta)替换成样品名，最后进行合并就可以获取汇总表格。
 ```
 
+### 所有样品在一个文件夹，对应基因组下载的结果
+```
+conda activate MAG_snakemake_518
+cd /data/Xianjinyuan/LD_lab/public_datasets/culturomics_datasets
+snakemake -s snakefile_gtdb_in1fd --use-singularity --singularity-args "--bind /data/Xianjinyuan/LD_lab/databases/GTDBTk/release207_v2/:/refdata/" --jobs 1 --cores 120 
+#似乎这个版本一定要输入jobs的数量，好处是就算不利用cluster也能并行,然后--cores设置一定要放在最后，放在前面居然会报错
+```
 
 ## 参考资料：

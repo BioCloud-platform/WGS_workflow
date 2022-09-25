@@ -1,0 +1,38 @@
+inputdir = "test_GTDB/"
+outputdir = "test_GTDB_out/"
+
+#STRAINS = glob_wildcards(join(inputdir,"{strains}_genomic.fna.gz")).strains
+
+
+rule all:
+  input:
+    os.path.join(outputdir, "gtdbtk.log"),
+    os.path.join(outputdir, "gtdbtk.bac120.anno_only.tsv")
+
+rule GTDB:
+  input:
+    in_dir = inputdir
+  output:
+    out_log = os.path.join(outputdir, "gtdbtk.log")
+  params:
+    out_dir = directory(outputdir)
+  singularity:
+    "docker://ecogenomic/gtdbtk:2.1.1"
+  threads:
+    120
+  shell:
+    "gtdbtk classify_wf --genome_dir {input.in_dir} --out_dir {params.out_dir} --extension .fna.gz --cpus {threads} >{output.out_log}"
+
+SEP_CMD = r"""-F '\t'"""
+LEN_READS_CMD = r"""{printf ("%s\t%s\n", $1, $2)}"""
+
+rule GTDB_anno:
+  input:
+    out_log = os.path.join(outputdir, "gtdbtk.log")
+  output:
+    out_anno = os.path.join(outputdir, "gtdbtk.bac120.anno_only.tsv")
+  params:
+    in_anno = os.path.join(outputdir, "gtdbtk.bac120.summary.tsv")
+  shell:
+    "awk {SEP_CMD} {LEN_READS_CMD:q} {params.in_anno} > {output.out_anno}" #注，用到awk需要注意引号的使用，可以用{}把内容打包，且:q与否会有区别，摘自：https://carpentries-incubator.github.io/snakemake-novice-bioinformatics/13-quoting/index.html#:~:text=Using%20%7BLEN_READS_CMD%3Aq%7D%20instead%20of%20%27%20%7BLEN_READS_CMD%7D%27%20is%20asking,then%20Snakemake%20will%20quote%20it%20robustly%20for%20you.
+
