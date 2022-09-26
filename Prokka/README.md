@@ -23,5 +23,14 @@ snakemake -s snakefile_prokka -c 8 --use-singularity --singularity-args "--bind 
 #当前逻辑是每个样品分别跑
 ```
 
+从文件读入相关的样品的list（每行一个样品），而不是自己弄一个list（更自动化）。
+```
+conda activate MAG_snakemake_518
+cd /data/Xianjinyuan/LD_lab/public_datasets/culturomics_datasets
+snakemake -s snakefile_prokka_by_filelist --use-singularity --singularity-args "--bind /data/Xianjinyuan/LD_lab/" --jobs 60 --cores 120 
+#似乎这个版本一定要输入jobs的数量，好处是就算不利用cluster也能并行,然后--cores设置一定要放在最后，放在前面居然会报错
+
+```
+
 ## 注意事项
 

@@ -1,0 +1,36 @@
+import pandas
+outputdir = "SAG_nonHuman_pangenome"
+indir = "."
+
+sample_list = "Ecoli_accessID_extract.txt"
+df = pandas.read_csv(sample_list,dtype=str,header=None) 
+
+sample = df[0].to_list()
+
+rule all:
+  input:
+    expand(os.path.join(outputdir, "prokka/{sample}/{sample}.gbk"), sample = sample)
+
+# Annotation
+rule unzip:
+  input:
+    "SAG_nonHuman/{sample}_genomic.fna.gz",
+  output:
+    temp("SAG_nonHuman/{sample}_genomic.fna")
+  shell:
+    "gunzip {input}"
+
+
+rule prokka:
+  input:
+    temp("SAG_nonHuman/{sample}_genomic.fna"),
+  output:
+    os.path.join(outputdir, "prokka/{sample}/{sample}.gbk")
+  params:
+    output_dir = os.path.join(outputdir, "prokka/{sample}"),
+  singularity:
+    "docker://staphb/prokka:1.14.5"
+  threads:
+    2
+  shell:
+    "prokka --addgenes --outdir {params.output_dir} --prefix {wildcards.sample} --force --cpus {threads} {input}"
