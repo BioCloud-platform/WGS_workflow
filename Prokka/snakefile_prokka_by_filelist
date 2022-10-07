@@ -2,7 +2,7 @@ import pandas
 outputdir = "SAG_nonHuman_pangenome"
 indir = "."
 
-sample_list = "Ecoli_accessID_extract.txt"
+sample_list = "Ecoli_accessID_sorted_extract.txt"
 df = pandas.read_csv(sample_list,dtype=str,header=None) 
 
 sample = df[0].to_list()

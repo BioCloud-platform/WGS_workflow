@@ -29,7 +29,7 @@ conda activate MAG_snakemake_518
 cd /data/Xianjinyuan/LD_lab/public_datasets/culturomics_datasets
 snakemake -s snakefile_prokka_by_filelist --use-singularity --singularity-args "--bind /data/Xianjinyuan/LD_lab/" --jobs 60 --cores 120 
 #似乎这个版本一定要输入jobs的数量，好处是就算不利用cluster也能并行,然后--cores设置一定要放在最后，放在前面居然会报错
-
+#当前的设置，似乎跑100来个就会报错一次，发现主要是内存不足的问题。一直往下调，调到2个jobs才行。。。。（10个都不行）
 ```
 
 ## 注意事项
