@@ -2,7 +2,7 @@
 
 ## 使用场景：细菌全基因组的功能全面注释，做为prokka结果的进一步补充
 
-## 需要另外下载数据库
+## 若本地无数据库，需要另外下载数据库（但很大，尽可能用公用已有的）
 ### conda安装方式，然后通过download_eggnog_data.py来进行下载
 ```
 mamba create -c bioconda eggnog-mapper=2.1.8 -n eggnog-2.1.8
