@@ -15,7 +15,7 @@ rule checkM:
     folder=directory(os.path.join(outputdir, "checkM_new", "{sample}")),
     log_out=os.path.join(outputdir, "checkM_new", "{sample}.checkm.out")
   singularity:
-    "docker://sstevens/checkm:latest"
+    "docker://nanozoo/checkm:1.1.3--c79a047"
   threads:
     config["ncores"]
   shell:
