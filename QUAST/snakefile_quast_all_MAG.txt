@@ -1,0 +1,22 @@
+inputdir = "./"
+
+PROJECTS = glob_wildcards(os.path.join(inputdir,"{projects}_GTDB")).projects
+
+rule all:
+  input:
+    expand(os.path.join(inputdir, "{PROJECTS}_quast", "report.tsv"), PROJECTS = PROJECTS)
+
+rule quast:
+  input:
+    folder_in=os.path.join(inputdir,"{PROJECTS}"),
+  output:
+    log_out=os.path.join(inputdir, "{PROJECTS}_quast", "report.tsv"),
+  params:
+    directory(os.path.join(inputdir, "{PROJECTS}_quast")),
+  singularity:
+    "docker://nanozoo/quast:5.0.2--e7f0cfe"
+  threads:
+    10
+  shell:
+    "input_fasta=`find {input.folder_in} -name *_genomic.fna`;"
+    "quast -t {threads} -o {params} $input_fasta"

@@ -11,3 +11,10 @@ QUAST解读.pptx
 ## 注意事项
 
 ## 测试数据例子
+#例子一，每个项目的fna都在目录下单独的各项目文件夹里，此时可以通过该范例一次全部跑完（其中脚本中有识别文件夹中所有fasta文件的代码）
+```
+cd /data/Xianjinyuan/LD_lab/public_datasets/culturomics_datasets/public_MAGs
+conda activate MAG_snakemake
+snakemake -np -s snakefile_quast_all_MAG.txt #测试
+snakemake -s snakefile_quast_all_MAG.txt -c 80 --use-singularity
+```
