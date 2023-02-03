@@ -32,5 +32,16 @@ snakemake -s snakefile_prokka_by_filelist --use-singularity --singularity-args "
 #当前的设置，似乎跑100来个就会报错一次，发现主要是内存不足的问题。一直往下调，调到2个jobs才行。。。。（10个都不行）
 ```
 
+### 附加功能
+1. 通过对其tsv文件进行统计，得到关于rRNA和tRNA的数量的信息，见RNA_number_extract_from_prokka_out.R
+
+整体串联的例子见snakefile_prokka_PRJNA530070.txt
+```
+cd /data/Xianjinyuan/LD_lab/public_datasets/culturomics_datasets/public_MAGs
+conda activate MAG_snakemake
+snakemake -s snakefile_prokka_PRJNA530070.txt -c 80 --use-singularity --singularity-args "--bind /data/Xianjinyuan/tanyuxiang/YT_scripts/"
+```
+
+
 ## 注意事项
 

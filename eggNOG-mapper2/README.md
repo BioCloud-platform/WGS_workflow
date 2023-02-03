@@ -30,6 +30,8 @@ emapper.py -i {input} --itype {type} --output {output} -d bact --usemem --cpu {t
 ## 注意事项
 根据输入的类型不同，需要设置--itype， {CDS,proteins,genome,metagenome} ，默认是proteins
 
+执行时最好把--resume加上，不然有些任务断了以后，会影响未来通过snakemake重新跑。
+
 
 ## 输出结果的格式
 ```

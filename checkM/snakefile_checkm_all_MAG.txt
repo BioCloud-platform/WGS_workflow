@@ -1,0 +1,23 @@
+inputdir = "./"
+
+PROJECTS = glob_wildcards(os.path.join(inputdir,"{projects}_GTDB")).projects
+
+rule all:
+  input:
+    expand(os.path.join(inputdir, "{PROJECTS}_checkM", "{PROJECTS}.checkm.out"), PROJECTS = PROJECTS),
+
+
+rule checkM:
+  input:
+    os.path.join(inputdir,"{PROJECTS}"),
+  output:
+    log_out=os.path.join(inputdir, "{PROJECTS}_checkM", "{PROJECTS}.checkm.out")
+  singularity:
+    "docker://nanozoo/checkm:1.1.3--c79a047"
+  params:
+    folder=directory(os.path.join(inputdir, "{PROJECTS}_checkM")),
+  threads:
+    20
+  shell:
+    "if (( `ls {input} | head | grep '.fa$' | wc -l` >= 8 ));then att_name='fa';elif (( `ls {input} | head | grep '.fna$' | wc -l` >= 8 ));then att_name='fna';elif (( `ls {input} | head | grep '.fasta$' | wc -l` >= 8 ));then att_name='fasta';else echo 'No suffix matched, exit';exit 7;fi;echo $att_name;checkm lineage_wf -t {threads} -x $att_name {input} {params.folder} -f {output.log_out} --tab_table"
+

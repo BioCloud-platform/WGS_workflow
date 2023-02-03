@@ -28,6 +28,8 @@ gunc download_db /data/Xianjinyuan/LD_lab/databases #/path/to/output/dir/
 
 3. --input_dir和--file_suffix经常要连用，例如：--input_dir {input.folder_in} --file_suffix fna
 
+3.1 为了能更自动化识别suffix，下面的示例脚本（snakefile_GUNC_all_MAG.txt）里增加了一段自动识别suffix的判断语句
+
 ## 输出结果的格式
 ```
 #genome n_genes_called  n_genes_mapped  n_contigs   taxonomic_level proportion_genes_retained_in_major_clades   genes_retained_index    clade_separation_score  contamination_portion   n_effective_surplus_clades  mean_hit_identity   reference_representation_score  pass.GUNC

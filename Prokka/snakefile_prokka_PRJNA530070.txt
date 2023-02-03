@@ -1,0 +1,47 @@
+import os
+
+inputdir = "PRJNA530070/"
+outputdir = "PRJNA530070_prokka/"
+R_extract ="/data/Xianjinyuan/tanyuxiang/YT_scripts/RNA_number_extract_from_prokka_out.R"
+
+STRAINS = glob_wildcards(os.path.join(inputdir,"{strains}.fna")).strains
+
+rule all:
+  input:
+    expand(os.path.join(outputdir, "{STRAINS}/{STRAINS}.tsv"), STRAINS = STRAINS),
+    expand(os.path.join(outputdir, "{STRAINS}/{STRAINS}.tsv.trRNA_counts.tsv"), STRAINS = STRAINS),
+    os.path.join(outputdir, "trRNA_counts_merge.tsv")
+
+# Annotation
+rule prokka:
+  input:
+    os.path.join(inputdir,"{STRAINS}.fna")
+  output:
+    os.path.join(outputdir, "{STRAINS}/{STRAINS}.tsv")
+  params:
+    output_dir = os.path.join(outputdir, "{STRAINS}"),
+  singularity:
+    "docker://staphb/prokka:1.14.5"
+  threads:
+    10
+  shell:
+    "prokka --addgenes --outdir {params.output_dir} --prefix {wildcards.STRAINS} --force --cpus {threads} {input}"
+
+rule RNA_extract:
+  input:
+    os.path.join(outputdir, "{STRAINS}/{STRAINS}.tsv")
+  output:
+    os.path.join(outputdir, "{STRAINS}/{STRAINS}.tsv.trRNA_counts.tsv")
+  singularity:
+    "docker://rocker/tidyverse:4.2.2"
+  shell:
+    "Rscript {R_extract} file_in={input} sample_name={wildcards.STRAINS}"
+
+rule RNA_count_merge:
+  input:
+    expand(os.path.join(outputdir, "{STRAINS}/{STRAINS}.tsv.trRNA_counts.tsv"), STRAINS = STRAINS),
+  output:
+    os.path.join(outputdir, "trRNA_counts_merge.tsv")
+  shell:
+    "cat {input} > {output}"
+

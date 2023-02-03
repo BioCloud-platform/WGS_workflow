@@ -19,4 +19,4 @@ rule checkM:
   threads:
     config["ncores"]
   shell:
-    "checkm lineage_wf -t {threads} -x fasta {input} {output.folder}> {output.log_out}"
+    "checkm lineage_wf -t {threads} -x fasta {input} {output.folder} -f {output.log_out} --tab_table" # by -f and --table, the output will be in tsv format, which is easier for downstream analysis
