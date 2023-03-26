@@ -52,13 +52,29 @@ if (!file.exists(file_in)) {
 #file_in <- "/data/Xianjinyuan/LD_lab/public_datasets/culturomics_datasets/115.genomes_hGMB_LC_prokka/Taxon_100.genome/Taxon_100.genome.tsv"
 #sample_name <- "Taxon_100.genome"
 prokka_tsv <- read.table(file_in, sep='\t',colClasses = "character",comment.char = "", quote="", header=TRUE) #quote is very important in reading functional annotation files
-tRNA_list <- unique(str_split(unique(prokka_tsv[which(prokka_tsv[,"ftype"]=="tRNA"),"product"]),fixed("("),simplify=TRUE)[,1])
-rRNA_list <- prokka_tsv[which(prokka_tsv[,"ftype"]=="rRNA"),"product"]
-rRNA5S_list <- rRNA_list[which(grepl("5S",rRNA_list))]
-rRNA16S_list <- rRNA_list[which(grepl("16S",rRNA_list))]
-rRNA23S_list <- rRNA_list[which(grepl("23S",rRNA_list))]
+if (length(which(prokka_tsv[,"ftype"]=="tRNA")) > 0) {
+    tRNA_list <- unique(str_split(unique(prokka_tsv[which(prokka_tsv[,"ftype"]=="tRNA"),"product"]),fixed("("),simplify=TRUE)[,1])
+    tRNA_list_len = length(tRNA_list)
+}else{
+    tRNA_list_len=0
+}
 
-out_line <- paste(sample_name,as.character(length(rRNA5S_list)),as.character(length(rRNA16S_list)),as.character(length(rRNA23S_list)),as.character(length(tRNA_list)),sep="\t")
+if (length(which(prokka_tsv[,"ftype"]=="rRNA")) > 0) {
+    rRNA_list <- prokka_tsv[which(prokka_tsv[,"ftype"]=="rRNA"),"product"]
+    rRNA5S_list <- rRNA_list[which(grepl("5S",rRNA_list))]
+    rRNA16S_list <- rRNA_list[which(grepl("16S",rRNA_list))]
+    rRNA23S_list <- rRNA_list[which(grepl("23S",rRNA_list))]
+    rRNA5S_list_len = length(rRNA5S_list)
+    rRNA16S_list_len = length(rRNA16S_list)
+    rRNA23S_list_len = length(rRNA23S_list)
+} else {
+    rRNA5S_list_len = 0
+    rRNA16S_list_len = 0
+    rRNA23S_list_len = 0
+
+}
+
+out_line <- paste(sample_name,as.character(rRNA5S_list_len),as.character(rRNA16S_list_len),as.character(rRNA23S_list_len),as.character(tRNA_list_len),sep="\t")
 
 cat(paste0(out_line,"\n"),file=paste0(file_in,".trRNA_counts.tsv"))
 
