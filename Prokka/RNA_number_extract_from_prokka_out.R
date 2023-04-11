@@ -74,7 +74,12 @@ if (length(which(prokka_tsv[,"ftype"]=="rRNA")) > 0) {
 
 }
 
-out_line <- paste(sample_name,as.character(rRNA5S_list_len),as.character(rRNA16S_list_len),as.character(rRNA23S_list_len),as.character(tRNA_list_len),sep="\t")
+cds_matr <- subset(prokka_tsv,prokka_tsv[,"ftype"]=="CDS")
+
+#gene 包括 CDS、 tRNA、tmRNA
+hypothetical_rate <- length(which(cds_matr[,"product"]=="hypothetical protein"))/dim(prokka_tsv)[1]*2
+
+out_line <- paste(sample_name,as.character(rRNA5S_list_len),as.character(rRNA16S_list_len),as.character(rRNA23S_list_len),as.character(tRNA_list_len),as.character(hypothetical_rate),sep="\t")
 
 cat(paste0(out_line,"\n"),file=paste0(file_in,".trRNA_counts.tsv"))
 

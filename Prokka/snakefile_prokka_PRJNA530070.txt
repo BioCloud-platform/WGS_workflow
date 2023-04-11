@@ -22,6 +22,8 @@ rule prokka:
     output_dir = os.path.join(outputdir, "{STRAINS}"),
   singularity:
     "docker://staphb/prokka:1.14.5"
+  benchmark:
+    os.path.join(outputdir,"benchmarks/{STRAINS}.txt")
   threads:
     10
   shell:
