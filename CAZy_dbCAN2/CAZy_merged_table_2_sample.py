@@ -1,10 +1,19 @@
+import os
 import pandas 
 import numpy 
+import argparse
+
+parser = argparse.ArgumentParser(description='CAZy annotations reshape')
+parser.add_argument('-i', '--input', dest='InF', type=str, required=True,
+                    help="the path of the merge file")
+parser.add_argument('-o', '--output', dest='OutF', type=str, required=True,
+                    help="the output path of the reshape file")
+args = parser.parse_args()
 
 #file_in="cazy_final_out.csv"
-file_in=snakemake.input.merge_file
+file_in=os.path.abspath(args.InF)
 #file_out="cazy_final_out_reshape.csv"
-file_out=snakemake.output.table_file
+file_out=os.path.abspath(args.OutF)
 
 df_ori = pandas.read_csv(file_in,dtype=str) 
 

@@ -26,13 +26,18 @@ limitations under the License.
 #update the output processing for dbcan3, which is using eCAMI instead of Hotpep
 #modified for the use of snakemake.
 
+#updata log
+#2023-08-26 by Yuxiang Tan
+#modified for the use back to python, because of the general usage need.
+
+
 import os
 import re
 import argparse
 import subprocess
 import pandas as pd
-from itertools import repeat
-from multiprocessing import Pool, freeze_support
+#from itertools import repeat
+#from multiprocessing import Pool, freeze_support
 
 ## parse dbCAN result
 def parseDbcan(dbcanDir):
@@ -74,23 +79,44 @@ def removeTail(string):
     return mod_string
 
 
+parser = argparse.ArgumentParser(description='CAZy annotations')
+parser.add_argument('-i', '--input', dest='InDir', type=str, required=True,
+                    help="the path of the CAZy folder")
+parser.add_argument('-o', '--output', dest='OutF', type=str, required=True,
+                    help="the output path of merge file")
+args = parser.parse_args()
+
+InDir = os.path.abspath(args.InDir)
+OutF = os.path.abspath(args.OutF)
+
+
 #####data processing####################
-df_concat = parseDbcan(snakemake.input.dbcanDir)
+#df_concat = parseDbcan(snakemake.input.dbcanDir)
+df_concat = parseDbcan(InDir)
 df = df_concat.loc[df_concat["#ofTools"] >= 2]
 df.loc[:, 'HMMER'] = df['HMMER'].apply(Clean_names)
-#df.loc[:, 'Hotpep'] = df['Hotpep'].apply(Clean_names)
+df.loc[:, 'eCAMI'] = df['eCAMI'].apply(Clean_names)
 df.loc[:, 'HMMER'] = df['HMMER'].apply(Clean_hmm_names)
 df = df.reset_index()
 
 #rename
 for i in range(len(df)):
     if df.loc[i, "HMMER"] == "-":
-        df.loc[i, "cazy"] = df.loc[i, "DIAMOND"]
-    else:
-        if df.loc[i, "HMMER"] == df.loc[i, "DIAMOND"]: 
-            df.loc[i, "cazy"] = df.loc[i, "HMMER"]
+        if df.loc[i, "eCAMI"] == df.loc[i, "DIAMOND"]: 
+            df.loc[i, "cazy"] = df.loc[i, "eCAMI"]
         else:
             df.loc[i, "cazy"] = "Conflict"
+    else:
+        if df.loc[i, "HMMER"] == df.loc[i, "eCAMI"]: 
+            df.loc[i, "cazy"] = df.loc[i, "HMMER"]
+        else:
+            if df.loc[i, "HMMER"] == df.loc[i, "DIAMOND"]: 
+                df.loc[i, "cazy"] = df.loc[i, "HMMER"]
+            else:
+                if df.loc[i, "eCAMI"] == df.loc[i, "DIAMOND"]: 
+                    df.loc[i, "cazy"] = df.loc[i, "eCAMI"]
+                else:
+                    df.loc[i, "cazy"] = "Conflict"
 
 #for contig import, removeTail is misleading, but for CDS, it maybe necessary
 #df["GeneID"] = df["Gene ID"].apply(removeTail)
@@ -100,7 +126,8 @@ final = pd.DataFrame()
 final["SampleID"] = df["SampleID"]
 final["GeneID"] = df["Gene ID"]
 final["CAZy"] = df["cazy"]
-final.to_csv(snakemake.output.merge_file, index=None)
+#final.to_csv(snakemake.output.merge_file, index=None)
+final.to_csv(OutF, index=None)
 
 #sep output for each sample
 sampleList = list(df["SampleID"].unique())
@@ -109,4 +136,5 @@ for sample in sampleList:
     df2 = final[final["SampleID"] == sample]
     df1["GeneID"] = df2["GeneID"]
     df1["CAZy"] = df2["CAZy"]
-    df1.to_csv(os.path.join(snakemake.input.dbcanDir, sample + ".csv"), index=None)
+    #df1.to_csv(os.path.join(snakemake.input.dbcanDir, sample + ".csv"), index=None)
+    df1.to_csv(os.path.join(InDir, sample + ".csv"), index=None)

@@ -38,6 +38,9 @@ output文件夹内，主要有用的是final_out文件夹，每个样品一个�
 
 建库例子：fas其实就是和faa类似的蛋白序列文件，从VFDB里提取(The VFDB_setA_pro.fas was downloaded from [VFDB: Virulence Factors of Bacterial Pathogens (mgc.ac.cn)](http://www.mgc.ac.cn/cgi-bin/VFs/v5/main.cgi) in the download page as the protein sequences of core dataset at 2021_04_13.)
 
+2023-08-26下载：VFDB_setA_nt.fas  VFDB_setA_pro.fas  VFDB_setB_nt.fas  VFDB_setB_pro.fas
+其中setA是core（实验验证的），setB是core+预测；nt是DNA，pro是蛋白，主要看输入是什么格式的数据来选用，fna对应nt，faa对应pro，
+
 ```
 diamond makedb --in /home/chenjunyu/Lab/Anno/database/vfdb/VFDB_setA_pro.fas -d /home/chenjunyu/Lab/Anno/database/vfdb/VFDB_setA_pro
 ```
@@ -100,6 +103,14 @@ snakemake -s snakefile_VFDB -c 8 --use-singularity --singularity-args "--bind /n
 ##汇总表格里的数值是score，另外也有定量表和定性表
 ```
 当前用的是直接diamond blastp，而非上面的blastp_func_anno.py ，后面可能还是需要进一步改良。
+
+```
+#针对泛基因组分析的案例
+conda activate MAG_snakemake
+cd /data/archive/tanyuxiang/2-tooltest/xls2csv/merge_2023-06_all_merge/panaroo/
+snakemake -s snakefile_VFDB_pangenome.py -c 10 --use-singularity --singularity-args "--bind /data/Xianjinyuan/" #此处没使用cluster，需要的话要加相关参数；--singularity-args是为了识别上层目录的内容
+
+```
 
 ## 结果解读：文件本身没header。
 具体header信息见：https://www.metagenomics.wiki/tools/blast/blastn-output-format-6

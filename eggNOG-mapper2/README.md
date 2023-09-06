@@ -6,7 +6,7 @@
 ### conda安装方式，然后通过download_eggnog_data.py来进行下载
 ```
 mamba create -c bioconda eggnog-mapper=2.1.8 -n eggnog-2.1.8
-conda activate eggnog-mapper=2.1.8
+conda activate eggnog-2.1.8
 download_eggnog_data.py #需要手动选择y
 #如果提醒无法访问目标目录，需要自己提前创建。总数据库大小超过10G
 #如果要强制执行，可以用-y选项
@@ -21,7 +21,7 @@ download_eggnog_data.py --data_dir {数据库路径} -y -H -d taxid #下载HMMER
 
 ## 代码例子
 ```
-conda activate eggnog-mapper=2.1.8
+conda activate eggnog-2.1.8
 emapper.py -i {input} --itype {type} --output {output} -d bact --usemem --cpu {threads} --data_dir {数据库路径}
 ```
 

@@ -1,6 +1,6 @@
 # DBCAN2: CAZy annotation for pangenome or WGS genes
 
-## Notes：
+## Notes：最新版本是dbCAN4，沿用dbCAN3的snakemake脚本,可以直接跳到该部分，前面的都基本过期了
 
 ### 目前泛基因组只测试过panphlan，WGS只测试过prokka的输出
 
@@ -101,7 +101,7 @@ time python /data/Xianjinyuan/tanyuxiang/YT_scripts/run_dbcan.py -i panphlan_ref
 
 
 
-## Database generation history 
+## Database generation history (only works in the anno env)
 
 ```
 cd /data/Xianjinyuan/LD_lab/databases/CAZy_dbCAN2_db/dbCAN2_db_2021_03_15/ \
@@ -115,7 +115,7 @@ cd /data/Xianjinyuan/LD_lab/databases/CAZy_dbCAN2_db/dbCAN2_db_2021_03_15/ \
 
 see [Index of /dbCAN2/download (unl.edu)](https://bcb.unl.edu/dbCAN2/download/) for updates and instructions
 
-v11
+v11,实际上就是后面dbCAN4的数据库构建方式
 ```
 cd /nasdir/xinyi/3-databases/CAZy/v11-20220806
 wget http://bcb.unl.edu/dbCAN2/download/Databases/V11/CAZyDB.08062022.fa \
@@ -153,7 +153,7 @@ snakemake -s snakefile_CAZy -c 8 --use-singularity --singularity-args "--bind /n
 #当前逻辑是每个样品分别跑，然后最后assign_dbcan_snakemake.py脚本把注释结果整理的同时也加了样品信息,最后通过CAZy_merged_table_2_sample.py转换成样品对酶族的表格，可用于下游作图分析。
 ```
 
-目前只是直接用的dbCAN3，和上面提供的run_dbcan.py里的dbCAN不一样，3重比较是有的，但是Hotpep被换成eCAMI，就没法投票机制了。
+目前只是直接用的dbCAN3，和上面提供的run_dbcan.py里的dbCAN不一样，3重比较是有的，但是Hotpep被换成eCAMI，就没法投票机制了。但是最新的版本似乎eCAMI也是可以参与投票的，和HMM的结果类似，所以又加回去了
 ```
 V3.0.2: Added eCAMI tool, remove Hotpep from run_dbCAN;
 v2.0.11:Add ec number prediction to hotpep result;
@@ -163,3 +163,44 @@ v2.0.11:Add ec number prediction to hotpep result;
 目前只有HMMER有结果的才会被使用，如果HMMER有结果，但是跟diamond不一样，也会被扔掉。
 
 貌似最后生成的cazy_final_out.csv里的conflict其实还不少，目前并没有进行处理，相当于被扔掉了。
+
+### 最新版本是dbCAN4，沿用dbCAN3的snakemake脚本，下面是建库的方式
+```
+singularity pull /data/Xianjinyuan/LD_lab/singularity_images/run_dbcan-4.0.0.sif docker://haidyi/run_dbcan:latest
+#里面不包含数据库，所以还是要自建
+cd /data/Xianjinyuan/LD_lab/databases/CAZy_dbCAN2_db/dbCAN2_db_2023_08_28/db
+wget http://bcb.unl.edu/dbCAN2/download/Databases/fam-substrate-mapping-08252022.tsv
+wget http://bcb.unl.edu/dbCAN2/download/Databases/PUL.faa 
+wget http://bcb.unl.edu/dbCAN2/download/Databases/dbCAN-PUL_07-01-2022.xlsx
+wget http://bcb.unl.edu/dbCAN2/download/Databases/dbCAN-PUL_07-01-2022.txt
+wget http://bcb.unl.edu/dbCAN2/download/Databases/dbCAN-PUL.tar.gz 
+wget http://bcb.unl.edu/dbCAN2/download/Databases/dbCAN_sub.hmm 
+wget http://bcb.unl.edu/dbCAN2/download/Databases/V11/CAZyDB.08062022.fa 
+wget https://bcb.unl.edu/dbCAN2/download/Databases/V11/dbCAN-HMMdb-V11.txt
+wget https://bcb.unl.edu/dbCAN2/download/Databases/V11/tcdb.fa 
+wget http://bcb.unl.edu/dbCAN2/download/Databases/V11/tf-1.hmm 
+wget http://bcb.unl.edu/dbCAN2/download/Databases/V11/tf-2.hmm 
+wget https://bcb.unl.edu/dbCAN2/download/Databases/V11/stp.hmm 
+tar xvf dbCAN-PUL.tar.gz
+##database
+singularity shell --bind /data/ /data/archive/LD_lab/singularity_images/run_dbcan-4.0.0.sif
+diamond makedb --in CAZyDB.08062022.fa -d CAZy
+diamond makedb --in tcdb.fa -d tcdb
+hmmpress dbCAN_sub.hmm
+hmmpress tf-1.hmm
+hmmpress tf-2.hmm
+hmmpress stp.hmm
+mv dbCAN-HMMdb-V11.txt dbCAN.txt && hmmpress dbCAN.txt
+exit
+##不知道为什么里面没blast，然后还得建，不确定版本会不会影响
+singularity shell --bind /data/ /data/archive/LD_lab/singularity_images/blast-2.13.0.sif
+makeblastdb -in PUL.faa -dbtype prot
+exit
+#下面这个我不是非常确定用途是什么，感觉其实不太相关
+cd ..
+wget http://bcb.unl.edu/dbCAN2/download/Samples/EscheriaColiK12MG1655.fna
+wget http://bcb.unl.edu/dbCAN2/download/Samples/EscheriaColiK12MG1655.faa
+wget http://bcb.unl.edu/dbCAN2/download/Samples/EscheriaColiK12MG1655.gff
+```
+#### 运行可以参考snakefile_CAZy_dbCAN4.py，该脚本用于对泛基因组进行注释，实际操作时可能需要根据具体需求调整，但是逻辑不用变：
+先是跑run_dbcan，然后assign_dbcan_snakemake.py进行判定，最后调整格式。【因为对两个py进行了调整，原snakefile_CAZy里的后两步应该是受影响跑步了的】

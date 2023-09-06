@@ -1,0 +1,16 @@
+############################################################
+# Dockerfile to build rgi with database
+# Based on mamba
+# To build:
+# docker build -t yuxiangtan/rgi6.0.2:card3.2.7 -f rgi_dockerfile.txt .
+############################################################
+
+FROM condaforge/mambaforge:latest
+#######install rgi, it requires python 3.8.6 (other python versions were not supported)
+RUN mamba install python=3.8.6 -c bioconda -c conda-forge -y && \
+    mamba install rgi=6.0.2 -c bioconda -c conda-forge -c cctbx202208 -y
+
+#######get the database
+RUN rgi auto_load
+
+ENTRYPOINT ["/bin/bash"]

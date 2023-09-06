@@ -49,12 +49,12 @@ if (!file.exists(file_in)) {
 }
 
 
-#file_in <- "/data/Xianjinyuan/LD_lab/public_datasets/culturomics_datasets/public_MAGs/PRJEB39057_eggnog2/bin.1026.STRAINS.emapper.annotations"
-#sample_name <- "bin.1026"
+#file_in <- "/data/Xianjinyuan/LD_lab/public_datasets/culturomics_datasets/public_MAGs/PRJEB39057_eggnog2/S52T80_bins.89.STRAINS.emapper.annotations"
+#sample_name <- "S52T80_bins.89"
 eggnog_tsv <- read.table(file_in, sep='\t',colClasses = "character",comment.char = "", quote="", header=FALSE) #quote is very important in reading functional annotation files
 
-COG_emp = subset(eggnog_tsv, eggnog_tsv[,"V7"] == "-")
-COG_emp_ann <- COG_emp[,7:21]
+COG_emp = subset(eggnog_tsv, eggnog_tsv[,"V7"] == "-") #get the most possible empty annotations.
+COG_emp_ann <- COG_emp[,7:21] # double check whether they are all empty
 check_emp <- function(list){
     if(sum(list=="-")==15){
         #sum==15 means all "-"
@@ -69,7 +69,7 @@ emp_anno_rows<-sum(apply(COG_emp_ann,1,check_emp))
 
 hypothetical_rate <- emp_anno_rows/dim(eggnog_tsv)[1]
 
-out_line <- paste(sample_name,as.character(hypothetical_rate),sep="\t")
+out_line <- paste(sample_name,as.character(hypothetical_rate),emp_anno_rows,dim(eggnog_tsv)[1],sep="\t") # header: sample_name, empty_rate, empty_num, total_gene_num
 
 cat(paste0(out_line,"\n"),file=paste0(file_in,".hypo_rate.tsv"))
 
