@@ -57,9 +57,9 @@ Key optional parameters:
 
 dbcan里是每个样品的三种注释方法的结果，其汇总在overview.txt里
 
-cazy文件夹是每个样品整理后的最终注释
+cazy文件夹是每个样品整理后的最终注释(利用的是assign_dbcan_snakemake.py,原理是每个GH在三种注释里出现了最少两次的就会保留。注意，是每个GH，不是整个字段串)
 
-cazy_final_out.csv 是所有样品的汇总结果
+cazy_final_out.csv 是所有样品的汇总结果 （利用的是CAZy_merged_table_2_sample.py）
 
 
 
