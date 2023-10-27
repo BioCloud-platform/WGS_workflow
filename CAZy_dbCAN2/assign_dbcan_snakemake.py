@@ -30,6 +30,11 @@ limitations under the License.
 #2023-08-26 by Yuxiang Tan
 #modified for the use back to python, because of the general usage need.
 
+#updata log
+#2023-10-26 by Yuxiang Tan
+#modified the logic of format uniform of annotations
+#modified the logic decide what GHs to be kept
+
 
 import os
 import re
@@ -58,25 +63,38 @@ def parseDbcan(dbcanDir):
 
 # Function to clean the names 
 def Clean_names(CAZy_name): 
-    # Search for opening bracket in the name followed by 
-    # any characters repeated any number of times 
-    if re.search('\(.*', CAZy_name): 
-        # Extract the position of beginning of pattern 
-        pos = re.search('\(.*', CAZy_name).start() 
-        # return the cleaned name 
-        return CAZy_name[:pos] 
-    else: 
-        # if clean up needed return the same name 
-        return CAZy_name 
-# Function to clean hmm names 
-def Clean_hmm_names(CAZy_name): 
-    CAZy_name = str(CAZy_name).split("_")[0]
-    return CAZy_name
-def removeTail(string):
-    pattern = "_frame=" + r'[0-9]'
-    # Match all digits in the string and replace them by empty string
-    mod_string = re.sub(pattern, '', string)
-    return mod_string
+    #split by +
+    elements = CAZy_name.split("+")
+
+    #clean the brakets and "_" 似乎没必要，主要是eCAMI没这个单元
+    clean_elements = []
+    for element in elements:
+        cleaned = re.sub('\(.*?\)',"",element)
+        cleaned = cleaned.split("_")[0]
+        clean_elements.append(cleaned)
+
+    #reconnect
+    clean_string = "+".join(clean_elements)
+    return clean_string   
+
+def getKey_gt_i(clean_elements_i,cutoff_i): 
+    counts = {}
+    for x in clean_elements_i:
+        counts[x] = counts.get(x, 0) + 1
+
+    keys_gt1 = [k for k, v in counts.items() if v > cutoff_i]
+    return keys_gt1
+
+
+# # Function to clean hmm names - 似乎已经过期了
+# def Clean_hmm_names(CAZy_name): 
+#     CAZy_name = str(CAZy_name).split("_")[0]
+#     return CAZy_name
+# def removeTail(string):
+#     pattern = "_frame=" + r'[0-9]'
+#     # Match all digits in the string and replace them by empty string
+#     mod_string = re.sub(pattern, '', string)
+#     return mod_string
 
 
 parser = argparse.ArgumentParser(description='CAZy annotations')
@@ -96,27 +114,58 @@ df_concat = parseDbcan(InDir)
 df = df_concat.loc[df_concat["#ofTools"] >= 2]
 df.loc[:, 'HMMER'] = df['HMMER'].apply(Clean_names)
 df.loc[:, 'eCAMI'] = df['eCAMI'].apply(Clean_names)
-df.loc[:, 'HMMER'] = df['HMMER'].apply(Clean_hmm_names)
+#df.loc[:, 'HMMER'] = df['HMMER'].apply(Clean_hmm_names)
+df.loc[:, 'DIAMOND'] = df['DIAMOND'].apply(Clean_names)
 df = df.reset_index()
 
-#rename
+#rename logic: the elements shown > 2 times will be kept, if more than 2 annotations exists
 for i in range(len(df)):
-    if df.loc[i, "HMMER"] == "-":
-        if df.loc[i, "eCAMI"] == df.loc[i, "DIAMOND"]: 
-            df.loc[i, "cazy"] = df.loc[i, "eCAMI"]
-        else:
+    #get results of each method into a list
+    count_i = 0
+    clean_elements_i = []
+
+    ##check availablity
+    if df.loc[i, "HMMER"] != "-":
+        count_i +=1
+        clean_elements_i.extend(df.loc[i, "HMMER"].split("+"))
+
+    if df.loc[i, "eCAMI"] != "-":
+        count_i +=1
+        clean_elements_i.extend(df.loc[i, "eCAMI"].split("+"))
+
+    if df.loc[i, "DIAMOND"] != "-":
+        count_i +=1
+        clean_elements_i.extend(df.loc[i, "DIAMOND"].split("+"))
+
+    if count_i > 1:
+        out_string = "+".join(getKey_gt_i(clean_elements_i,1))
+        if out_string == "":
             df.loc[i, "cazy"] = "Conflict"
-    else:
-        if df.loc[i, "HMMER"] == df.loc[i, "eCAMI"]: 
-            df.loc[i, "cazy"] = df.loc[i, "HMMER"]
         else:
-            if df.loc[i, "HMMER"] == df.loc[i, "DIAMOND"]: 
-                df.loc[i, "cazy"] = df.loc[i, "HMMER"]
-            else:
-                if df.loc[i, "eCAMI"] == df.loc[i, "DIAMOND"]: 
-                    df.loc[i, "cazy"] = df.loc[i, "eCAMI"]
-                else:
-                    df.loc[i, "cazy"] = "Conflict"
+            df.loc[i, "cazy"] = out_string
+    else:
+        df.loc[i, "cazy"] = "+".join(clean_elements_i)
+
+
+#This is the old, full mathcing logic
+# for i in range(len(df)):
+#     if df.loc[i, "HMMER"] == "-":
+#         if df.loc[i, "eCAMI"] == df.loc[i, "DIAMOND"]: 
+#             df.loc[i, "cazy"] = df.loc[i, "eCAMI"]
+#         else:
+#             df.loc[i, "cazy"] = "Conflict"
+#     else:
+#         if df.loc[i, "HMMER"] == df.loc[i, "eCAMI"]: 
+#             df.loc[i, "cazy"] = df.loc[i, "HMMER"]
+#         else:
+#             if df.loc[i, "HMMER"] == df.loc[i, "DIAMOND"]: 
+#                 df.loc[i, "cazy"] = df.loc[i, "HMMER"]
+#             else:
+#                 if df.loc[i, "eCAMI"] == df.loc[i, "DIAMOND"]: 
+#                     df.loc[i, "cazy"] = df.loc[i, "eCAMI"]
+#                 else:
+#                     df.loc[i, "cazy"] = "Conflict"
+
 
 #for contig import, removeTail is misleading, but for CDS, it maybe necessary
 #df["GeneID"] = df["Gene ID"].apply(removeTail)

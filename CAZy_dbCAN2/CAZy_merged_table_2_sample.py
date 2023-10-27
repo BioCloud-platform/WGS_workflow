@@ -41,3 +41,39 @@ df_out.to_csv(file_out,encoding = 'utf8')
 df_out_numeric.to_csv(file_out+"_numeric.csv",encoding = 'utf8')
 
 df_out_binary.to_csv(file_out+"_binary.csv",encoding = 'utf8')
+
+
+col_names = list(df_out)
+
+dupe_map = {}
+
+for header in col_names:
+    parts = header.split('+')
+    for part in parts:
+        dupe_map.setdefault(part, []).append(header)
+
+dupe_columns = list(dupe_map.keys())
+df_new = pandas.DataFrame(index=df_out.index,columns=dupe_columns)
+df_new_numeric = df_new.copy(deep=True)
+df_new_binary = df_new.copy(deep=True)
+
+for i_row in df_new.index.to_list():
+    for i_col in list(df_new):
+        values = df_out.loc[i_row,dupe_map[i_col]].tolist()
+        valid_values = [v for v in values if not pandas.isna(v)]
+        if len(valid_values) == 0:
+            df_new[i_col][i_row] = numpy.nan
+        else:
+            df_new[i_col][i_row] = "|".join(valid_values)
+        if pandas.isnull(df_new[i_col][i_row]):
+            df_new_numeric[i_col][i_row]=0
+            df_new_binary[i_col][i_row]=0
+        else:
+            df_new_numeric[i_col][i_row]=len(df_new[i_col][i_row].split("|"))
+            df_new_binary[i_col][i_row]=1
+
+df_new.T.to_csv(file_out.replace(".csv", "")+"_regrouped.csv",encoding = 'utf8')
+
+df_new_numeric.T.to_csv(file_out.replace(".csv", "")+"_regrouped_numeric.csv",encoding = 'utf8')
+
+df_new_binary.T.to_csv(file_out.replace(".csv", "")+"_regrouped_binary.csv",encoding = 'utf8')
