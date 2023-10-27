@@ -9,7 +9,7 @@
 1. seqtk从基因序列生成可能的6种蛋白序列；如果输入的是prokka的faa文件，则应该跳过（通过-p参数设置）
 2. 使用dbcan2，对蛋白序列进行三种方法的注释
 3. 对注释结果进行整理：只有2种或以上方法都注释的才考虑。其中，最优先使用HMMER的结果，其次是Hotpep的结果，DIAMOND的结果不被考虑。【这个需要检查 一下逻辑】
-4. 最新版本的dbCAN，似乎不用Hotpep，而是用了eCAMI（适合EC对应的，和CAZY注释其实没什么关系），导致其结果可读性很奇怪。
+4. 最新版本的dbCAN，不用Hotpep，而是用了eCAMI,已经修复了注释不对应的问题。
 
 
 
@@ -59,7 +59,7 @@ dbcan里是每个样品的三种注释方法的结果，其汇总在overview.txt
 
 cazy文件夹是每个样品整理后的最终注释(利用的是assign_dbcan_snakemake.py,原理是每个GH在三种注释里出现了最少两次的就会保留。注意，是每个GH，不是整个字段串)
 
-cazy_final_out.csv 是所有样品的汇总结果 （利用的是CAZy_merged_table_2_sample.py）
+cazy_final_out.csv 是所有样品的汇总结果 （利用的是CAZy_merged_table_2_sample.py），最新的版本是把+号分隔的单元都拆出来了，避免不必要的歧义，并且列是基因组，行是GH，方便后续的合并，核心输出是cazy_final_out_reshape_regrouped.csv 和 cazy_final_out_reshape_regrouped_numeric.csv
 
 
 
