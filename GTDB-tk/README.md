@@ -13,7 +13,24 @@ GTDB-tk.pptx
 wget -c https://data.ace.uq.edu.au/public/gtdb/data/releases/release207/207.0/auxillary_files/gtdbtk_r207_v2_data.tar.gz
 tar -zxvf gtdbtk_r207_v2_data.tar.gz
 ```
-路径例子：/nasdir/xinyi/3-databases/gtdbtk
+
+## 数据库下载(v2.3.2对应)
+```
+wget -c https://data.gtdb.ecogenomic.org/releases/release214/214.1/auxillary_files/gtdbtk_r214_data.tar.gz
+tar -zxvf gtdbtk_r214_data.tar.gz
+```
+
+```
+注意，2.3.2版本需要增加一个--skip_ani_screen 参数（这样就和旧版本一致）
+What is the difference between the mutually exclusive options --mash_db and --skip_ani_screen?
+Starting with GTDB-Tk v2.2+, the classify_wf and classify function require an extra parameter to run: --mash_db or --skip_ani_screen.
+With this new version of Tk, The first stage of classify pipelines (classify_wf and classify) is to compare all user genomes to all reference genomes and annotate them, if possible, based on ANI matches.
+Using the --mash_db option will indicate to GTDB-Tk the path of the sketched Mash database require for ANI screening.
+If no database are available ( i.e. this is the first time running classify ), the --mash_db option will sketch a new Mash database that can be used for subsequent calls.
+The --skip_ani_screen option will skip the pre-screening step and classify all genomes similar to previous versions of GTDB-Tk.
+
+此外，新的镜像，要手动设定参考基因组路径：export GTDBTK_DATA_PATH=/refdata，所以我直接在snakefile里面加了这一步。
+```
 
 ## 代码例子
 conda activate /home/chenjunyu/miniconda3/envs/gtdbtk 
