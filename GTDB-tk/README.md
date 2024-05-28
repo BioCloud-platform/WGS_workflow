@@ -76,4 +76,9 @@ snakemake -s snakefile_gtdb_in1fd --use-singularity --singularity-args "--bind /
 #似乎这个版本一定要输入jobs的数量，好处是就算不利用cluster也能并行,然后--cores设置一定要放在最后，放在前面居然会报错
 ```
 
+### 内存使用和速度优化
+```
+GTDB-tk v2比v1使用的内存少了很多，大概需要<55GB的内存。如果还需要降低内存使用，可以参考https://forum.gtdb.ecogenomic.org/t/pplacer-requirements/53/3。因为主要的内存就是pplacer导致的。
+```
+
 ## 参考资料：

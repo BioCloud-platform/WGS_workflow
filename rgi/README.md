@@ -61,7 +61,7 @@ rgi wildcard_annotation -i card_variants --card_json card_data/card.json -v 4.0.
 
 使用前要先检查版本：rgi database --version;如果要load，要用上面的方式load完整，理论上来说，在conda环境下load好一次，snakemake调用的时候就不用重复load了，因为其识别是conda里的路径。
 
-此外，rgi似乎没办法用singularity镜像，主要是数据库太大，而且其文件还要跟着镜像，导致镜像oversize.【数据库可以不加到里面，每次用的时候加载】
+此外，rgi可以用镜像，最好直接使用--local的数据库（就是在运行目录下，先把数据库load好到--local一次，然后反复运行就不需要了。
 
 
 ## snakemake的格式
