@@ -13,16 +13,16 @@ rule all:
     expand(os.path.join(panaroo_outdir, "VFDB_setA", "{sample}_vf_anno.txt"), sample = SPECIES),
     expand(os.path.join(panaroo_outdir, "VFDB_setA", "{sample}_vf_sample_anno.txt"), sample = SPECIES),
     os.path.join(panaroo_outdir, "VFDB_setA", "VFDB_merged.tsv"),
-    os.path.join(panaroo_outdir, "VFDB_setA", "VFDB_merged_reshape.csv"),
+    os.path.join(panaroo_outdir, "VFDB_setA", "VFDB_merged_reshape.tsv"),
     expand(os.path.join(panaroo_outdir, "VFDB_setB", "{sample}_vf_anno.txt"), sample = SPECIES),
     expand(os.path.join(panaroo_outdir, "VFDB_setB", "{sample}_vf_sample_anno.txt"), sample = SPECIES),
     os.path.join(panaroo_outdir, "VFDB_setB", "VFDB_merged.tsv"),
-    os.path.join(panaroo_outdir, "VFDB_setB", "VFDB_merged_reshape.csv"),
+    os.path.join(panaroo_outdir, "VFDB_setB", "VFDB_merged_reshape.tsv"),
 
 # Annotation
 rule VFDB_setA:
   input:
-    GF_fa = os.path.join(panaroo_outdir, "{SPECIES}", "pan_genome_reference.fa"),
+    GF_fa = os.path.join(panaroo_outdir, "{SPECIES}", "pan_genome_reference.fa"), #这个是fna格式，理论上应该是用blastx；用blastp的，应该是用faa格式的输入
   output:
     os.path.join(panaroo_outdir, "VFDB_setA","{SPECIES}_vf_anno.txt"),
   singularity:
@@ -60,12 +60,20 @@ rule out_merged_setA:
   shell:
     "cat {input} > {output}" 
 
+rule out_merged_setA_strains_list:
+    input:
+        expand(os.path.join(panaroo_outdir, "VFDB_setA", "{SPECIES}_vf_sample_anno.txt"), SPECIES=SPECIES),
+    output:
+        os.path.join(panaroo_outdir, "VFDB_setA_strains_list.txt"),
+    shell:
+        "ls {input} | xargs -n 1 basename | sed 's/_vf_sample_anno.txt//' > {output}"
+
 rule merged_reshape_setA:
   input:
     merge_file = os.path.join(panaroo_outdir, "VFDB_setA", "VFDB_merged.tsv"),
   output:
-    table_file = os.path.join(panaroo_outdir, "VFDB_setA", "VFDB_merged_reshape.csv"),
-  script:
+    table_file = os.path.join(panaroo_outdir, "VFDB_setA", "VFDB_merged_reshape.tsv"),
+  shell:
     "python {VFDB_script_fd}/VFDB_merged_table_2_sample.py -i {input.merge_file} -o {output.table_file}" 
 
 rule add_sample_name_setB:
@@ -84,10 +92,18 @@ rule out_merged_setB:
   shell:
     "cat {input} > {output}" 
 
+rule out_merged_setB_strains_list:
+    input:
+        expand(os.path.join(panaroo_outdir, "VFDB_setB", "{SPECIES}_vf_sample_anno.txt"), SPECIES=SPECIES),
+    output:
+        os.path.join(panaroo_outdir, "VFDB_setB_strains_list.txt"),
+    shell:
+        "ls {input} | xargs -n 1 basename | sed 's/_vf_sample_anno.txt//' > {output}"
+
 rule merged_reshape_setB:
   input:
     merge_file = os.path.join(panaroo_outdir, "VFDB_setB", "VFDB_merged.tsv"),
   output:
-    table_file = os.path.join(panaroo_outdir, "VFDB_setB", "VFDB_merged_reshape.csv"),
-  script:
+    table_file = os.path.join(panaroo_outdir, "VFDB_setB", "VFDB_merged_reshape.tsv"),
+  shell:
     "python {VFDB_script_fd}/VFDB_merged_table_2_sample.py -i {input.merge_file} -o {output.table_file}" 

@@ -1,10 +1,10 @@
 import os
-import pandas 
+import pandas as pd
 import numpy 
 import argparse
 import time
 
-parser = argparse.ArgumentParser(description='VFDB annotations reshape')
+parser = argparse.ArgumentParser(description='defense finder gene reshape')
 parser.add_argument('-i', '--input', dest='InF', type=str, required=True,
                     help="the path of the merge file")
 parser.add_argument('-l', '--list', dest='InList', type=str, required=True,
@@ -13,24 +13,26 @@ parser.add_argument('-o', '--output', dest='OutF', type=str, required=True,
                     help="the output path of the reshape file")
 args = parser.parse_args()
 
-#file_in="VFDB_merged.tsv"
+#file_in="/data/Xianjinyuan/LD_lab/public_datasets/culturomics_datasets/public_MAGs/GMGC_AntiPhage/defense_finder_genes_anno_merged.tsv"
 file_in=os.path.abspath(args.InF)
-#file_list="VFDB_setA_strains_list.txt"
+#file_list="/data/Xianjinyuan/LD_lab/public_datasets/culturomics_datasets/public_MAGs/GMGC_AntiPhage/"
 file_list=os.path.abspath(args.InList)
-#file_out="VFDB_merged_reshape.tsv"
+#file_out="/data/Xianjinyuan/LD_lab/public_datasets/culturomics_datasets/public_MAGs/GMGC_AntiPhage/defense_finder_genes_anno_merged_reshape.tsv"
 file_out=os.path.abspath(args.OutF)
 
-import pandas as pd
 start = time.time()
 
 # 读取数据，避免内存占用过大
 df_ori = pd.read_csv(file_in, dtype=str, sep="\t", header=None, low_memory=True)
 
-df_ori.columns = ["qID","VFDB_ID","pident","length","mismatch","gapopen","qstart","qend","sstart","send","evalue","bitscore"]
-df_ori[['SampleID', 'ppID']] = df_ori["qID"].str.split('|', expand = True) #expand 才会出列
+df_ori.columns = [
+    "SampleID", "replicon", "hit_id", "gene_name", "hit_pos", "model_fqn", "sys_id", "sys_loci", "locus_num", "sys_wholeness",
+    "sys_score", "sys_occ", "hit_gene_ref", "hit_status", "hit_seq_len", "hit_i_eval", "hit_score", "hit_profile_cov",
+    "hit_seq_cov", "hit_begin_match", "hit_end_match", "counterpart", "used_in", "type", "subtype", "activity"
+]
 
 # 用 groupby() 代替 pivot_table，提高效率
-df_out = df_ori.groupby(["VFDB_ID", "SampleID"])["bitscore"].agg(lambda x: "|".join(map(str, x))).unstack(fill_value="0")
+df_out = df_ori.groupby(["gene_name", "SampleID"])["hit_score"].agg(lambda x: "|".join(map(str, x))).unstack(fill_value="0")
 end = time.time()
 print(f"groupby运行时间: {end - start:.2f} 秒")
 
@@ -40,6 +42,7 @@ df_list = pd.read_csv(file_list, dtype=str, sep="\t", header=None, names=["Sampl
 all_samples = df_list["SampleID"].unique()
 # 使用 reindex 补充缺失样品列，并填充 0
 df_out = df_out.reindex(columns=all_samples, fill_value="0")
+
 
 # 写出转换后的表格
 df_out.T.to_csv(file_out, sep="\t",encoding="utf8")

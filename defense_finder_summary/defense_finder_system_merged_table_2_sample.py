@@ -1,10 +1,10 @@
 import os
-import pandas 
+import pandas as pd
 import numpy 
 import argparse
 import time
 
-parser = argparse.ArgumentParser(description='VFDB annotations reshape')
+parser = argparse.ArgumentParser(description='defense finder system reshape')
 parser.add_argument('-i', '--input', dest='InF', type=str, required=True,
                     help="the path of the merge file")
 parser.add_argument('-l', '--list', dest='InList', type=str, required=True,
@@ -13,24 +13,21 @@ parser.add_argument('-o', '--output', dest='OutF', type=str, required=True,
                     help="the output path of the reshape file")
 args = parser.parse_args()
 
-#file_in="VFDB_merged.tsv"
+#file_in="/data/Xianjinyuan/LD_lab/public_datasets/culturomics_datasets/public_isolate_proj/miBC_others_AntiPhage/GCF_000364225.2_ASM36422v2_genomic/GCF_000364225.2_ASM36422v2_genomic_defense_finder_systems.tsv"
 file_in=os.path.abspath(args.InF)
-#file_list="VFDB_setA_strains_list.txt"
 file_list=os.path.abspath(args.InList)
-#file_out="VFDB_merged_reshape.tsv"
+#file_out="/data/Xianjinyuan/LD_lab/public_datasets/culturomics_datasets/public_isolate_proj/miBC_others_AntiPhage/GCF_000364225.2_ASM36422v2_genomic/GCF_000364225.2_ASM36422v2_genomic_defense_finder_systems_anno.tsv"
 file_out=os.path.abspath(args.OutF)
 
-import pandas as pd
 start = time.time()
 
 # 读取数据，避免内存占用过大
 df_ori = pd.read_csv(file_in, dtype=str, sep="\t", header=None, low_memory=True)
-
-df_ori.columns = ["qID","VFDB_ID","pident","length","mismatch","gapopen","qstart","qend","sstart","send","evalue","bitscore"]
-df_ori[['SampleID', 'ppID']] = df_ori["qID"].str.split('|', expand = True) #expand 才会出列
+df_ori.columns = ["SampleID","sys_id","type","subtype","activity","sys_beg","sys_end","protein_in_syst","genes_count","name_of_profiles_in_sys"]
 
 # 用 groupby() 代替 pivot_table，提高效率
-df_out = df_ori.groupby(["VFDB_ID", "SampleID"])["bitscore"].agg(lambda x: "|".join(map(str, x))).unstack(fill_value="0")
+df_out = df_ori.groupby(["subtype", "SampleID"])["genes_count"].agg(lambda x: "|".join(map(str, x))).unstack(fill_value="0") #用subtype是因为它才是每一行实际的代表，如果用type，就可以把多行再进一步压缩
+#正常来说，system是个汇总表，因此每个样品就该只出现一次，因此不应该再有多个gene count的情况
 end = time.time()
 print(f"groupby运行时间: {end - start:.2f} 秒")
 
@@ -40,6 +37,7 @@ df_list = pd.read_csv(file_list, dtype=str, sep="\t", header=None, names=["Sampl
 all_samples = df_list["SampleID"].unique()
 # 使用 reindex 补充缺失样品列，并填充 0
 df_out = df_out.reindex(columns=all_samples, fill_value="0")
+
 
 # 写出转换后的表格
 df_out.T.to_csv(file_out, sep="\t",encoding="utf8")
